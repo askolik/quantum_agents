@@ -22,7 +22,7 @@ hyperparams = {
     'epsilon_schedule': ['fast'],
     'reps': 10,
     'env': Envs.CARTPOLE,
-    'save': False,
+    'save': True,
     'test': False
 }
 
