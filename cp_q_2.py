@@ -12,7 +12,7 @@ hyperparams = {
     'update_after': [10],
     'update_target_after': [30],
     'learning_rate': [0.001],
-    'learning_rate_in': [0.001],
+    'learning_rate_in': [0.0001],
     'learning_rate_out': [0.1],
     'circuit_depth': [10],
     'epsilon_schedule': ['fast'],

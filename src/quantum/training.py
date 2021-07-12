@@ -463,7 +463,7 @@ class QLearningCartpole(QLearning):
 
         return action, action_type
 
-    def train_step(self):
+    def train_step_orig(self):
         batch = random.choices(self.memory, k=self.batch_size)
         batch = self.interaction(*zip(*batch))
 
@@ -487,7 +487,7 @@ class QLearningCartpole(QLearning):
             [(grads[self.w_output], self.model.trainable_variables[self.w_output])])
 
     # @tf.function
-    def train_step_tutorial(self):
+    def train_step(self):
         # print("Update step")
         # it seems like for some reason the update step is only performed
         # twice at the beginning and never again when tf.function decorator is added?
