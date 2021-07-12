@@ -8,6 +8,8 @@ import gym
 import numpy as np
 import tensorflow as tf
 import tensorflow_quantum as tfq
+from tensorflow.python.keras import Sequential
+from tensorflow.python.keras.layers import Dense
 
 from config import Envs, BASE_PATH
 from src.envs.frozenlake.fl_create_opt_training_data import get_all_transitions
@@ -404,11 +406,9 @@ class QLearningCartpole(QLearning):
 
         self.learning_rate_in = hyperparams.get('learning_rate_in')
         self.learning_rate_out = hyperparams.get('learning_rate_out')
-        self.optimizer_input = tf.keras.optimizers.Adam(
-            learning_rate=self.learning_rate_in, amsgrad=True)
-        self.optimizer_output = tf.keras.optimizers.Adam(
-            learning_rate=self.learning_rate_out, amsgrad=True)
-        self.loss_fun = tf.keras.losses.Huber()
+        self.optimizer_input = tf.keras.optimizers.Adam(learning_rate=self.learning_rate_in)
+        self.optimizer_output = tf.keras.optimizers.Adam(learning_rate=self.learning_rate_out)
+        self.loss_fun = tf.keras.losses.mse
 
         self.w_input, self.w_var, self.w_output = 1, 0, 2
         self.model, self.target_model, self.circuit = self.initialize_models()
@@ -486,11 +486,7 @@ class QLearningCartpole(QLearning):
         self.optimizer_output.apply_gradients(
             [(grads[self.w_output], self.model.trainable_variables[self.w_output])])
 
-    # @tf.function
     def train_step(self):
-        # print("Update step")
-        # it seems like for some reason the update step is only performed
-        # twice at the beginning and never again when tf.function decorator is added?
         training_batch = random.choices(self.memory, k=self.batch_size)
         training_batch = self.interaction(*zip(*training_batch))
 
@@ -504,20 +500,17 @@ class QLearningCartpole(QLearning):
         next_states = tf.convert_to_tensor(next_states)
         done = tf.convert_to_tensor(done)
 
-        # Compute their target q_values and the masks on sampled actions
         future_rewards = self.target_model([empty_circuits(self.batch_size), next_states])
         target_q_values = rewards + (
                 self.gamma * tf.reduce_max(future_rewards, axis=1) * (1.0 - done))
         masks = tf.one_hot(training_batch.action, self.action_space)
 
-        # Train the model on the states and target Q-values
         with tf.GradientTape() as tape:
             tape.watch(self.model.trainable_variables)
             q_values = self.model([empty_circuits(self.batch_size), states])
             q_values_masked = tf.reduce_sum(tf.multiply(q_values, masks), axis=1)
-            loss = tf.keras.losses.Huber()(target_q_values, q_values_masked)
+            loss = self.loss_fun(target_q_values, q_values_masked)
 
-        # Backpropagation
         grads = tape.gradient(loss, self.model.trainable_variables)
         for optimizer, w in zip(
                 [self.optimizer_input, self.optimizer, self.optimizer_output],
@@ -540,6 +533,179 @@ class QLearningCartpole(QLearning):
             'learning_rate': self.learning_rate,
             'learning_rate_in': self.learning_rate_in,
             'learning_rate_out': self.learning_rate_out,
+            'env_solved_at': []
+        }
+
+        scores = []
+        recent_scores = []
+
+        if self.epsilon_schedule == 'linear':
+            eps_values = list(np.linspace(self.epsilon, self.epsilon_min, self.episodes)[::-1])
+
+        solved = False
+        for episode in range(self.episodes):
+            if solved:
+                break
+
+            state = self.env.reset()
+            for iteration in range(self.max_steps):
+                # self.env.render()
+
+                old_state = state
+                action, action_type = self.perform_action(state)
+                # print("Action:", action)
+
+                state, reward, done, _ = self.env.step(action)
+
+                self.add_to_memory(old_state, action, reward, state, done)
+
+                if done:
+                    scores.append(iteration + 1)
+                    meta['last_epsilon'] = self.epsilon
+
+                    if len(scores) > 100:
+                        recent_scores = scores[-100:]
+
+                    avg_score = np.mean(recent_scores) if recent_scores else np.mean(scores)
+                    print(
+                        "\rEpisode {:03d} , epsilon={:.4f}, action type={}, score={:03d}, avg score={:.3f}".format(
+                            episode, self.epsilon, action_type, iteration + 1, avg_score))
+
+                    break
+
+                if len(self.memory) >= self.batch_size and iteration % self.update_after == 0:
+                    # print("Train step outer")
+                    self.train_step()
+
+                if iteration % self.update_target_after == 0:
+                    self.target_model.set_weights(self.model.get_weights())
+
+            if np.mean(recent_scores) >= 195:
+                print("\nEnvironment solved in {} episodes.".format(episode), end="")
+                meta['env_solved_at'].append(episode)
+                solved = True
+
+            if self.epsilon_schedule == 'fast':
+                self.epsilon = max(self.epsilon_min, self.epsilon_decay * self.epsilon)
+            elif self.epsilon_schedule == 'linear':
+                self.epsilon = eps_values.pop()
+
+            if self.save:
+                self.save_data(meta, scores)
+
+
+class QLearningCartpoleClassical(QLearning):
+    def __init__(
+            self,
+            hyperparams,
+            env_name,
+            save=True,
+            save_as=None,
+            test=False,
+            path=BASE_PATH):
+
+        super(QLearningCartpoleClassical, self).__init__(
+            hyperparams, env_name, save, save_as, path, test)
+
+        self.env = gym.make(env_name.value)
+        self.max_steps = 200
+        self.action_space = self.env.action_space.n
+        self.observation_space = self.env.observation_space.shape[0]
+
+        self.n_hidden_layers = hyperparams.get('n_hidden_layers')
+        self.hidden_layer_config = hyperparams.get('hidden_layer_config')
+
+        self.interaction = namedtuple('interaction', ('state', 'action', 'reward', 'next_state', 'done'))
+        self.loss_fun = tf.keras.losses.mse
+
+        self.model, self.target_model = self.initialize_models()
+
+    def initialize_models(self):
+        model = Sequential()
+        target_model = Sequential()
+
+        model.add(
+            Dense(
+                self.hidden_layer_config[0], input_shape=(self.observation_space,), activation='relu'))
+
+        target_model.add(
+            Dense(
+                self.hidden_layer_config[0], input_shape=(self.observation_space,), activation='relu'))
+
+        for i in range(1, self.n_hidden_layers):
+            model.add(Dense(self.hidden_layer_config[i], activation='relu'))
+            target_model.add(Dense(self.hidden_layer_config[i], activation='relu'))
+
+        model.add(Dense(self.action_space, activation='linear'))
+        target_model.add(Dense(self.action_space, activation='linear'))
+
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(lr=self.learning_rate), loss=self.loss_fun, metrics=[])
+        model.build()
+
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(lr=self.learning_rate), loss=self.loss_fun, metrics=[])
+        model.build()
+
+        weights = model.get_weights()
+        target_model.set_weights(weights)
+
+        print(model.summary())
+
+        return model, target_model
+
+    def add_to_memory(self, state, action, reward, next_state, done):
+        transition = self.interaction(
+            state, action, reward, next_state, float(done))
+        self.memory.append(transition)
+
+    def perform_action(self, state):
+        action_type = 'random'
+        if np.random.random() < self.epsilon:
+            action = self.env.action_space.sample()
+        else:
+            q_vals = self.model(np.asarray([state]))
+            action = int(tf.argmax(q_vals[0]).numpy())
+            action_type = 'argmax'
+
+        return action, action_type
+
+    def train_step(self):
+        training_batch = random.choices(self.memory, k=self.batch_size)
+        training_batch = self.interaction(*zip(*training_batch))
+
+        states = np.asarray([x for x in training_batch.state])
+        rewards = np.asarray([x for x in training_batch.reward], dtype=np.float32)
+        next_states = np.asarray([x for x in training_batch.next_state])
+        done = np.asarray([x for x in training_batch.done], dtype=np.float32)
+
+        future_rewards = self.target_model([next_states])
+        target_q_values = rewards + (
+                self.gamma * tf.reduce_max(future_rewards, axis=1) * (1.0 - done))
+        masks = tf.one_hot(training_batch.action, self.action_space)
+
+        with tf.GradientTape() as tape:
+            tape.watch(self.model.trainable_variables)
+            q_values = self.model([states])
+            q_values_masked = tf.reduce_sum(tf.multiply(q_values, masks), axis=1)
+            loss = tf.keras.losses.mse(target_q_values, q_values_masked)
+
+        grads = tape.gradient(loss, self.model.trainable_variables)
+        self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
+
+    def perform_episodes(self):
+        meta = {
+            'episodes': self.episodes,
+            'batch_size': self.batch_size,
+            'gamma': self.gamma,
+            'update_after': self.update_after,
+            'update_target_after': self.update_target_after,
+            'last_epsilon': self.epsilon,
+            'epsilon': self.epsilon,
+            'epsilon_schedule': self.epsilon_schedule,
+            'epsilon_min': self.epsilon_min,
+            'epsilon_decay': self.epsilon_decay,
+            'learning_rate': self.learning_rate,
             'env_solved_at': []
         }
 

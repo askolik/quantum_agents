@@ -5,7 +5,7 @@ import time
 from copy import copy
 
 from config import BASE_PATH, Envs
-from src.quantum.training import RegressionFL, QLearning, QLearningFL, QLearningCartpole
+from src.quantum.training import RegressionFL, QLearning, QLearningFL, QLearningCartpole, QLearningCartpoleClassical
 
 
 def parallelize_fl_regression(hyperparams, path=BASE_PATH):
@@ -285,3 +285,103 @@ def _run_cp_q(args):
             test=test)
 
         cpq.perform_episodes()
+
+
+def parallelize_cp_c(hyperparams, path=BASE_PATH):
+    experiments = ([
+        hyperparams,
+        path,
+        episodes,
+        batch_size,
+        gamma,
+        update_after,
+        update_target_after,
+        epsilon,
+        epsilon_schedule,
+        epsilon_min,
+        epsilon_decay,
+        learning_rate,
+        n_hidden_layers,
+        hidden_layer_config]
+
+        for episodes in hyperparams.get('episodes')
+        for batch_size in hyperparams.get('batch_size')
+        for gamma in hyperparams.get('gamma')
+        for update_after in hyperparams.get('update_after')
+        for update_target_after in hyperparams.get('update_target_after')
+        for epsilon in hyperparams.get('epsilon')
+        for epsilon_schedule in hyperparams.get('epsilon_schedule')
+        for epsilon_min in hyperparams.get('epsilon_min')
+        for epsilon_decay in hyperparams.get('epsilon_decay')
+        for learning_rate in hyperparams.get('learning_rate')
+        for n_hidden_layers in hyperparams.get('n_hidden_layers')
+        for hidden_layer_config in hyperparams.get('hidden_layer_config')
+    )
+
+    # pool = multiprocessing.Pool()
+    # pool.map(_run_cp_q, experiments)
+    # pool.close()
+    # pool.join()
+
+    _run_cp_c(list(experiments)[0])
+
+    return None
+
+
+def _run_cp_c(args):
+    (
+        hyperparams,
+        path,
+        episodes,
+        batch_size,
+        gamma,
+        update_after,
+        update_target_after,
+        epsilon,
+        epsilon_schedule,
+        epsilon_min,
+        epsilon_decay,
+        learning_rate,
+        n_hidden_layers,
+        hidden_layer_config) = args
+
+    save = hyperparams.get('save', True)
+    save_as = hyperparams.get('save_as')
+    test = hyperparams.get('test', False)
+
+    if save_as is None:
+        timestamp = time.localtime()
+        save_as = time.strftime("%Y-%m-%d_%H-%M-%S", timestamp) + '_' + str(random.randint(0, 1000))
+
+    if test:
+        save_as = 'dummy'
+
+    hps = {
+        'episodes': episodes,
+        'batch_size': batch_size,
+        'gamma': gamma,
+        'update_after': update_after,
+        'update_target_after': update_target_after,
+        'epsilon': epsilon,
+        'epsilon_schedule': epsilon_schedule,
+        'epsilon_min': epsilon_min,
+        'epsilon_decay': epsilon_decay,
+        'learning_rate': learning_rate,
+        'n_hidden_layers': n_hidden_layers,
+        'hidden_layer_config': hidden_layer_config
+    }
+
+    for i in range(hyperparams.get('reps', 1)):
+        save_as_instance = copy(save_as)
+        if hyperparams.get('reps', 1) > 1:
+            save_as_instance += f'_{i}'
+
+        cpc = QLearningCartpoleClassical(
+            hyperparams=hps,
+            env_name=Envs.CARTPOLE,
+            save=save,
+            save_as=save_as_instance,
+            path=path,
+            test=test)
+
+        cpc.perform_episodes()
