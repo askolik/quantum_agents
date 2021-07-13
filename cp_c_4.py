@@ -17,7 +17,7 @@ hyperparams = {
     'learning_rate': [0.001],
     'epsilon_schedule': ['fast'],
     'n_hidden_layers': [3],
-    'hidden_layer_config': [[4, 15, 16]],
+    'hidden_layer_config': [[4, 24, 24]],
     'reps': 10,
     'env': Envs.CARTPOLE,
     'save': True,
@@ -26,4 +26,4 @@ hyperparams = {
 
 
 if __name__ == '__main__':
-    parallelize_cp_c(hyperparams, BASE_PATH + 'cartpole_classical/params_385/')
+    parallelize_cp_c(hyperparams, BASE_PATH + 'cartpole_classical/params_790/')

@@ -2,9 +2,8 @@ import tensorflow as tf
 from src.utils.limit_thread_usage import set_thread_usage_limit
 set_thread_usage_limit(10, tf)
 
-from config import BASE_PATH, ALICE_BASE_PATH, Envs, EncType
-from parallelize import parallelize_cp_q
-
+from config import BASE_PATH, Envs
+from parallelize import parallelize_cp_c
 
 hyperparams = {
     'episodes': [5000],
@@ -13,13 +12,12 @@ hyperparams = {
     'epsilon_decay': [0.99],
     'epsilon_min': [0.01],
     'gamma': [0.99],
-    'update_after': [10],
+    'update_after': [20],
     'update_target_after': [30],
     'learning_rate': [0.001],
-    'learning_rate_in': [0.0001],
-    'learning_rate_out': [0.1],
-    'circuit_depth': [15],
     'epsilon_schedule': ['fast'],
+    'n_hidden_layers': [3],
+    'hidden_layer_config': [[4, 15, 16]],
     'reps': 10,
     'env': Envs.CARTPOLE,
     'save': True,
@@ -28,4 +26,4 @@ hyperparams = {
 
 
 if __name__ == '__main__':
-    parallelize_cp_q(hyperparams, BASE_PATH + 'cartpole/depth_15_mse/')
+    parallelize_cp_c(hyperparams, BASE_PATH + 'cartpole_classical/params_385/')
