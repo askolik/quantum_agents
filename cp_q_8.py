@@ -28,4 +28,4 @@ hyperparams = {
 
 
 if __name__ == '__main__':
-    parallelize_cp_q(hyperparams, BASE_PATH + 'cartpole/depth_10/')
+    parallelize_cp_q(hyperparams, BASE_PATH + 'cartpole/depth_15_mse/')
