@@ -26,4 +26,4 @@ hyperparams = {
 
 
 if __name__ == '__main__':
-    parallelize_cp_c(hyperparams, BASE_PATH + 'cartpole_classical/params_582/')
+    parallelize_cp_c(hyperparams, BASE_PATH + 'cartpole_classical/params_790/')
