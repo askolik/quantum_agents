@@ -132,13 +132,13 @@ depth = 15
 # ############# deeper circuits #############################
 plot_avg_vals(
     'scores', 5000, 10,
-    '../../../../' + BASE_PATH + 'cartpole/depth_10/', 'depth 10', 'b',  # both, 56 params, PQC, 56 params
-    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1})
+    '/home/andrea/BAK/vql/data/' + 'cartpole/depth_10/', 'Huber', 'b',  # both, 56 params, PQC, 56 params
+    {'circuit_depth': depth, 'learning_rate': 0.0001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.01})
 
 plot_avg_vals(
     'scores', 5000, 10,
-    '../../../../' + BASE_PATH + 'cartpole/depth_10/', 'depth 10', 'r',  # both, 56 params, PQC, 56 params
-    {'circuit_depth': depth, 'learning_rate': 0.0001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1})
+    '/home/andrea/BAK/vql/data/' + 'cartpole/depth_15_mse/', 'MSE', 'r',  # both, 56 params, PQC, 56 params
+    {'circuit_depth': depth, 'learning_rate': 0.0001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.01})
 
 # plot_avg_vals(
 #     'scores', 5000, 10,
