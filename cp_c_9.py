@@ -13,7 +13,7 @@ hyperparams = {
     'epsilon_min': [0.01],
     'gamma': [0.99],
     'update_after': [5],
-    'update_target_after': [10],
+    'update_target_after': [5],
     'learning_rate': [0.001],
     'epsilon_schedule': ['fast'],
     'n_hidden_layers': [3],
