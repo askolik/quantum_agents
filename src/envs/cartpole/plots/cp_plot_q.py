@@ -128,17 +128,49 @@ plot_avg_vals(
 #     {'l1_units': 9, 'l2_units': 10, 'update_target_after': 20, 'update_after': 5, 'batch_size': 16, 'learning_rate': 0.01})
 
 
+bak_path = '/home/andrea/BAK/vql/data/'
+path = '../../../../' + BASE_PATH
+
 depth = 15
 # ############# deeper circuits #############################
 plot_avg_vals(
     'scores', 5000, 10,
-    '/home/andrea/BAK/vql/data/' + 'cartpole/depth_10/', 'Huber', 'b',  # both, 56 params, PQC, 56 params
-    {'circuit_depth': depth, 'learning_rate': 0.0001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.01})
+    bak_path + 'cartpole/depth_15_mse/', 'batch size 16', 'b',
+    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+     'batch_size': 16})
 
 plot_avg_vals(
     'scores', 5000, 10,
-    '/home/andrea/BAK/vql/data/' + 'cartpole/depth_15_mse/', 'MSE', 'r',  # both, 56 params, PQC, 56 params
-    {'circuit_depth': depth, 'learning_rate': 0.0001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.01})
+    path + 'cartpole/depth_15_mse/', 'batch size 32', 'r',
+    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+     'batch_size': 32})
+
+plot_avg_vals(
+    'scores', 5000, 10,
+    path + 'cartpole/depth_15_mse/', 'batch size 64', 'orange',
+    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+     'batch_size': 64})
+
+
+depth = 10
+# ############# deeper circuits #############################
+plot_avg_vals(
+    'scores', 5000, 10,
+    bak_path + 'cartpole/depth_10_mse/', 'batch size 16', 'purple',
+    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.1,
+     'batch_size': 16})
+
+
+# depth = 20
+# plot_avg_vals(
+#     'scores', 5000, 10,
+#     path + 'cartpole/depth_20_mse/', 'depth 20', 'purple',
+#     {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1})
+
+# plot_avg_vals(
+#     'scores', 5000, 10,
+#     '/home/andrea/BAK/vql/data/' + 'cartpole/depth_15_mse/', 'MSE', 'r',  # both, 56 params, PQC, 56 params
+#     {'circuit_depth': depth, 'learning_rate': 0.0001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.01})
 
 # plot_avg_vals(
 #     'scores', 5000, 10,

@@ -8,14 +8,14 @@ from parallelize import parallelize_cp_q
 
 hyperparams = {
     'episodes': [5000],
-    'batch_size': [16],
+    'batch_size': [64],
     'epsilon': [1],
     'epsilon_decay': [0.99],
     'epsilon_min': [0.01],
     'gamma': [0.99],
     'update_after': [10],
     'update_target_after': [30],
-    'learning_rate': [0.0001],
+    'learning_rate': [0.001],
     'learning_rate_in': [0.001],
     'learning_rate_out': [0.1],
     'circuit_depth': [20],

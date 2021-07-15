@@ -8,7 +8,7 @@ from parallelize import parallelize_cp_q
 
 hyperparams = {
     'episodes': [5000],
-    'batch_size': [16],
+    'batch_size': [64],
     'epsilon': [1],
     'epsilon_decay': [0.99],
     'epsilon_min': [0.01],
@@ -18,7 +18,7 @@ hyperparams = {
     'learning_rate': [0.0001],
     'learning_rate_in': [0.0001],
     'learning_rate_out': [0.01],
-    'circuit_depth': [15],
+    'circuit_depth': [3],
     'epsilon_schedule': ['fast'],
     'reps': 10,
     'env': Envs.CARTPOLE,
@@ -28,4 +28,4 @@ hyperparams = {
 
 
 if __name__ == '__main__':
-    parallelize_cp_q(hyperparams, BASE_PATH + 'cartpole/depth_15_mse/')
+    parallelize_cp_q(hyperparams, BASE_PATH + 'cartpole/depth_3_mse/')
