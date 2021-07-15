@@ -7,14 +7,14 @@ from parallelize import parallelize_cp_c
 
 hyperparams = {
     'episodes': [5000],
-    'batch_size': [16],
+    'batch_size': [32],
     'epsilon': [1],
     'epsilon_decay': [0.99],
     'epsilon_min': [0.01],
     'gamma': [0.99],
     'update_after': [5],
-    'update_target_after': [10],
-    'learning_rate': [0.0001],
+    'update_target_after': [5],
+    'learning_rate': [0.001],
     'epsilon_schedule': ['fast'],
     'n_hidden_layers': [3],
     'hidden_layer_config': [[4, 24, 24]],
