@@ -7,7 +7,7 @@ from parallelize import parallelize_cp_c
 
 hyperparams = {
     'episodes': [5000],
-    'batch_size': [16],
+    'batch_size': [64],
     'epsilon': [1],
     'epsilon_decay': [0.99],
     'epsilon_min': [0.01],
