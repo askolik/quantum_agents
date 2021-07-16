@@ -131,34 +131,41 @@ plot_avg_vals(
 bak_path = '/home/andrea/BAK/vql/data/'
 path = '../../../../' + BASE_PATH
 
-depth = 15
+depth = 3
 # ############# deeper circuits #############################
+
 plot_avg_vals(
     'scores', 5000, 10,
-    bak_path + 'cartpole/depth_15_mse/', 'batch size 16', 'b',
-    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+    path + f'cartpole/depth_{depth}_mse/', 'batch size 16', 'orange',
+    {'circuit_depth': depth, 'learning_rate': 0.0001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.01,
      'batch_size': 16})
 
 plot_avg_vals(
     'scores', 5000, 10,
-    path + 'cartpole/depth_15_mse/', 'batch size 32', 'r',
-    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+    path + f'cartpole/depth_{depth}_mse/', 'batch size 32', 'b',
+    {'circuit_depth': depth, 'learning_rate': 0.0001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.01,
      'batch_size': 32})
 
 plot_avg_vals(
     'scores', 5000, 10,
-    path + 'cartpole/depth_15_mse/', 'batch size 64', 'orange',
-    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+    path + f'cartpole/depth_{depth}_mse/', 'batch size 64', 'r',
+    {'circuit_depth': depth, 'learning_rate': 0.0001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.01,
      'batch_size': 64})
 
+# plot_avg_vals(
+#     'scores', 5000, 10,
+#     path + 'cartpole/depth_15_mse/', 'batch size 64', 'orange',
+#     {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+#      'batch_size': 64})
 
-depth = 10
-# ############# deeper circuits #############################
-plot_avg_vals(
-    'scores', 5000, 10,
-    bak_path + 'cartpole/depth_10_mse/', 'batch size 16', 'purple',
-    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.1,
-     'batch_size': 16})
+
+# depth = 10
+# # ############# deeper circuits #############################
+# plot_avg_vals(
+#     'scores', 5000, 10,
+#     bak_path + 'cartpole/depth_10_mse/', 'batch size 16', 'purple',
+#     {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.0001, 'learning_rate_out': 0.1,
+#      'batch_size': 16})
 
 
 # depth = 20
