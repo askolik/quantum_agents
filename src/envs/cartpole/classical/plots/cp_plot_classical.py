@@ -7,12 +7,29 @@ from src.utils.plots import plot_avg_vals
 bak_path = '/home/andrea/BAK/vql/data/'
 path = '../../../../../' + BASE_PATH
 
+
 hps = {
     'learning_rate': 0.001,
-    'update_after': 1, 'update_target_after': 1, 'batch_size': 32}
+    'update_after': 5, 'update_target_after': 5, 'batch_size': 64}
 plot_avg_vals(
     'scores', 5000, 10,
-     path + 'cartpole_classical/params_790/', 'update 1, 1', 'g', hps)
+     path + 'cartpole_classical/params_792/', '', 'g', hps)
+
+
+hps = {
+    'learning_rate': 0.01,
+    'update_after': 5, 'update_target_after': 10, 'batch_size': 32}
+plot_avg_vals(
+    'scores', 5000, 10,
+     path + 'cartpole_classical/params_790/', '', 'b', hps)
+
+
+depth = 10
+plot_avg_vals(
+    'scores', 5000, 10,
+    path + f'cartpole/depth_{depth}_mse/', 'batch size 16', 'red',
+    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+     'batch_size': 64})
 
 # hps = {
 #     'learning_rate': 0.0001,
