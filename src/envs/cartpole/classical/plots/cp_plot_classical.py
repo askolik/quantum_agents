@@ -9,11 +9,11 @@ path = '../../../../../' + BASE_PATH
 
 
 hps = {
-    'learning_rate': 0.001,
-    'update_after': 5, 'update_target_after': 5, 'batch_size': 64}
+    'learning_rate': 0.01,
+    'update_after': 5, 'update_target_after': 10, 'batch_size': 64}
 plot_avg_vals(
     'scores', 5000, 10,
-     path + 'cartpole_classical/params_792/', '', 'g', hps)
+     bak_path + 'cartpole_classical/params_790/', '', 'g', hps)
 
 
 hps = {
@@ -21,13 +21,21 @@ hps = {
     'update_after': 5, 'update_target_after': 10, 'batch_size': 32}
 plot_avg_vals(
     'scores', 5000, 10,
-     path + 'cartpole_classical/params_790/', '', 'b', hps)
+     bak_path + 'cartpole_classical/params_790/', '', 'b', hps)
+
+
+hps = {
+    'learning_rate': 0.0001,
+    'update_after': 10, 'update_target_after': 20, 'batch_size': 32}
+plot_avg_vals(
+    'scores', 5000, 10,
+     path + 'cartpole_classical/params_405/', '', 'orange', hps)
 
 
 depth = 10
 plot_avg_vals(
     'scores', 5000, 10,
-    path + f'cartpole/depth_{depth}_mse/', 'batch size 16', 'red',
+    bak_path + f'cartpole/depth_{depth}_mse/', 'PQC', 'red',
     {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
      'batch_size': 64})
 
