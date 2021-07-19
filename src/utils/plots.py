@@ -105,6 +105,8 @@ def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_
                 print(e)
 
     print(len(all_vals))
+    if len(all_vals) == 0:
+        pprint(hyperparams)
 
     clipped_vals = [x[:min_val] for x in all_vals]
     all_vals = clipped_vals

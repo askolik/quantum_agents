@@ -61,12 +61,6 @@ from src.utils.plots import plot_avg_vals
 #
 
 
-plot_avg_vals(
-    'scores', 5000, 10,
-    '/home/andrea/BAK/vql/data/' + 'cartpole/cirq/good_hps/', '5 layers', 'g',  # both, 56 params, PQC, 56 params
-    {'data_reuploading': True, 'n_layers': 5, 'train_weights': True, 'train_data_scaling': True})
-
-
 # # plot_avg_vals(
 # #     'scores', 5000, 10,
 # #     '../../../../' + BASE_PATH + 'cartpole/cirq/train_weights/', '5 layers', 'g',
@@ -130,25 +124,39 @@ plot_avg_vals(
 
 bak_path = '/home/andrea/BAK/vql/data/'
 path = '../../../../' + BASE_PATH
+plot_to = 3000
+
+
+plot_avg_vals(
+    'scores', 5000, 10,
+    '/home/andrea/BAK/vql/data/' + 'cartpole/cirq/good_hps/', '5 layers', 'g',
+    {'data_reuploading': True, 'n_layers': 5, 'train_weights': True, 'train_data_scaling': True}, plot_to=plot_to)
 
 depth = 10
 plot_avg_vals(
     'scores', 5000, 10,
-    bak_path + f'cartpole/depth_{depth}_mse/', 'depth 10', 'b',
+    bak_path + f'cartpole/depth_{depth}_mse/', '10 layers', 'b',
     {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-     'batch_size': 64})
+     'batch_size': 64}, plot_to=plot_to)
 
 depth = 15
 plot_avg_vals(
     'scores', 5000, 10,
-    bak_path + f'cartpole/depth_{depth}_mse/', 'depth 10', 'b',
+    bak_path + f'cartpole/depth_{depth}_mse/', '15 layers', 'orange',
     {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-     'batch_size': 32})
+     'batch_size': 32}, plot_to=plot_to)
+
+depth = 20
+plot_avg_vals(
+    'scores', 5000, 10,
+    bak_path + f'cartpole/depth_{depth}_mse/', '20 layers', 'red',
+    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+     'batch_size': 16}, plot_to=plot_to)
 
 
 plt.xlabel("Episode")
 plt.ylabel("Score")
-# plt.title("CartPole v0, averaged over 10 agents each")
+plt.title("PQCs with varying depth (preliminary)")
 # plt.ylim(ymax=200)
 plt.legend()  # loc='lower right')
 plt.show()
