@@ -9,27 +9,35 @@ path = '../../../../../' + BASE_PATH
 
 
 hps = {
-    'learning_rate': 0.01,
-    'update_after': 5, 'update_target_after': 10, 'batch_size': 64}
+    'learning_rate': 0.001,
+    'update_after': 5, 'update_target_after': 5, 'batch_size': 32}
 plot_avg_vals(
     'scores', 5000, 10,
-     bak_path + 'cartpole_classical/params_790/', '', 'g', hps)
+     path + 'cartpole_classical/params_1729/', '', 'g', hps)
 
 
 hps = {
-    'learning_rate': 0.01,
+    'learning_rate': 0.001,
     'update_after': 5, 'update_target_after': 10, 'batch_size': 32}
 plot_avg_vals(
     'scores', 5000, 10,
-     bak_path + 'cartpole_classical/params_790/', '', 'b', hps)
+     path + 'cartpole_classical/params_1729/', '', 'b', hps)
 
 
 hps = {
-    'learning_rate': 0.0001,
+    'learning_rate': 0.001,
     'update_after': 10, 'update_target_after': 20, 'batch_size': 32}
 plot_avg_vals(
     'scores', 5000, 10,
-     path + 'cartpole_classical/params_405/', '', 'orange', hps)
+     path + 'cartpole_classical/params_1729/', '', 'orange', hps)
+
+
+# hps = {
+#     'learning_rate': 0.001,
+#     'update_after': 20, 'update_target_after': 30, 'batch_size': 32}
+# plot_avg_vals(
+#     'scores', 5000, 10,
+#      path + 'cartpole_classical/params_1729/', '', 'purple', hps)
 
 
 depth = 10
@@ -38,6 +46,13 @@ plot_avg_vals(
     bak_path + f'cartpole/depth_{depth}_mse/', 'PQC', 'red',
     {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
      'batch_size': 64})
+
+depth = 15
+plot_avg_vals(
+    'scores', 5000, 10,
+    bak_path + f'cartpole/depth_{depth}_mse/', 'PQC', 'magenta',
+    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+     'batch_size': 32})
 
 # hps = {
 #     'learning_rate': 0.0001,
