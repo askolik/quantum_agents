@@ -409,6 +409,7 @@ class QLearningCartpole(QLearning):
         self.optimizer_input = tf.keras.optimizers.Adam(learning_rate=self.learning_rate_in)
         self.optimizer_output = tf.keras.optimizers.Adam(learning_rate=self.learning_rate_out)
         self.loss_fun = tf.keras.losses.mse
+        self.use_negative_rewards = hyperparams.get('use_negative_rewards', False)
 
         self.w_input, self.w_var, self.w_output = 1, 0, 2
         self.model, self.target_model, self.circuit = self.initialize_models()
@@ -463,29 +464,6 @@ class QLearningCartpole(QLearning):
 
         return action, action_type
 
-    def train_step_orig(self):
-        batch = random.choices(self.memory, k=self.batch_size)
-        batch = self.interaction(*zip(*batch))
-
-        future_rewards = self.target_model.predict(
-            [empty_circuits(self.batch_size), tf.constant(batch.next_state)])
-        target_q_values = tf.constant(batch.reward) + self.gamma * tf.reduce_max(future_rewards, axis=1) * (
-                1 - tf.constant(batch.done))
-        masks = tf.one_hot(batch.action, self.action_space)
-
-        with tf.GradientTape() as tape:
-            q_values = self.model([empty_circuits(self.batch_size), tf.constant(batch.state)])
-            q_values_masked = tf.reduce_sum(tf.multiply(q_values, masks), axis=1)
-            loss = self.loss_fun(target_q_values, q_values_masked)
-
-        grads = tape.gradient(loss, self.model.trainable_variables)
-        self.optimizer_input.apply_gradients(
-            [(grads[self.w_input], self.model.trainable_variables[self.w_input])])
-        self.optimizer.apply_gradients(
-            [(grads[self.w_var], self.model.trainable_variables[self.w_var])])
-        self.optimizer_output.apply_gradients(
-            [(grads[self.w_output], self.model.trainable_variables[self.w_output])])
-
     def train_step(self):
         training_batch = random.choices(self.memory, k=self.batch_size)
         training_batch = self.interaction(*zip(*training_batch))
@@ -533,6 +511,7 @@ class QLearningCartpole(QLearning):
             'learning_rate': self.learning_rate,
             'learning_rate_in': self.learning_rate_in,
             'learning_rate_out': self.learning_rate_out,
+            'use_negative_rewards': self.use_negative_rewards,
             'env_solved_at': []
         }
 
@@ -553,9 +532,13 @@ class QLearningCartpole(QLearning):
 
                 old_state = state
                 action, action_type = self.perform_action(state)
-                # print("Action:", action)
 
                 state, reward, done, _ = self.env.step(action)
+
+                # NNs perform much better when failed transitions get negative reward
+                if self.use_negative_rewards:
+                    if done and iteration < 199:
+                        reward *= -1
 
                 self.add_to_memory(old_state, action, reward, state, done)
 
@@ -617,6 +600,7 @@ class QLearningCartpoleClassical(QLearning):
 
         self.interaction = namedtuple('interaction', ('state', 'action', 'reward', 'next_state', 'done'))
         self.loss_fun = tf.keras.losses.mse
+        self.use_negative_rewards = hyperparams.get('use_negative_rewards', False)
 
         self.model, self.target_model = self.initialize_models()
 
@@ -706,6 +690,7 @@ class QLearningCartpoleClassical(QLearning):
             'epsilon_min': self.epsilon_min,
             'epsilon_decay': self.epsilon_decay,
             'learning_rate': self.learning_rate,
+            'use_negative_rewards': self.use_negative_rewards,
             'env_solved_at': []
         }
 
@@ -729,6 +714,11 @@ class QLearningCartpoleClassical(QLearning):
                 # print("Action:", action)
 
                 state, reward, done, _ = self.env.step(action)
+
+                # NNs perform much better when failed transitions get negative reward
+                if self.use_negative_rewards:
+                    if done and iteration < 199:
+                        reward *= -1
 
                 self.add_to_memory(old_state, action, reward, state, done)
 

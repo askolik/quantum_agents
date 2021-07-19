@@ -15,11 +15,12 @@ hyperparams = {
     'gamma': [0.99],
     'update_after': [10],
     'update_target_after': [30],
-    'learning_rate': [0.001],
+    'learning_rate': [0.01],
     'learning_rate_in': [0.001],
     'learning_rate_out': [0.1],
     'circuit_depth': [10],
     'epsilon_schedule': ['fast'],
+    'use_negative_rewards': True,
     'reps': 10,
     'env': Envs.CARTPOLE,
     'save': True,
@@ -28,4 +29,4 @@ hyperparams = {
 
 
 if __name__ == '__main__':
-    parallelize_cp_q(hyperparams, BASE_PATH + 'cartpole/depth_10_mse/')
+    parallelize_cp_q(hyperparams, BASE_PATH + 'cartpole/depth_10_neg_reward/')

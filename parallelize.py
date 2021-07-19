@@ -269,6 +269,7 @@ def _run_cp_q(args):
         'learning_rate': learning_rate,
         'learning_rate_in': learning_rate_in,
         'learning_rate_out': learning_rate_out,
+        'use_negative_rewards': hyperparams.get('use_negative_rewards', False)
     }
 
     for i in range(hyperparams.get('reps', 1)):
@@ -368,7 +369,8 @@ def _run_cp_c(args):
         'epsilon_decay': epsilon_decay,
         'learning_rate': learning_rate,
         'n_hidden_layers': n_hidden_layers,
-        'hidden_layer_config': hidden_layer_config
+        'hidden_layer_config': hidden_layer_config,
+        'use_negative_rewards': hyperparams.get('use_negative_rewards', False)
     }
 
     for i in range(hyperparams.get('reps', 1)):
