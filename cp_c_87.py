@@ -7,7 +7,7 @@ from parallelize import parallelize_cp_c
 
 hyperparams = {
     'episodes': [5000],
-    'batch_size': [64],
+    'batch_size': [16],
     'epsilon': [1],
     'epsilon_decay': [0.99],
     'epsilon_min': [0.01],
@@ -16,9 +16,8 @@ hyperparams = {
     'update_target_after': [10],
     'learning_rate': [0.001],
     'epsilon_schedule': ['fast'],
-    'n_hidden_layers': [4],
-    'hidden_layer_config': [[4, 30, 27, 24]],
-    'use_negative_rewards': True,
+    'n_hidden_layers': [2],
+    'hidden_layer_config': [[24, 24]],
     'reps': 10,
     'env': Envs.CARTPOLE,
     'save': True,
@@ -27,4 +26,4 @@ hyperparams = {
 
 
 if __name__ == '__main__':
-    parallelize_cp_c(hyperparams, BASE_PATH + 'cartpole_classical/params_1729/')
+    parallelize_cp_c(hyperparams, BASE_PATH + 'cartpole_classical/params_770/')
