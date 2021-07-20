@@ -12,18 +12,16 @@ from src.utils.utils import generate_all_bitstrings_of_size
 class ScalableDataReuploadingController(tf.keras.layers.Layer):
     def __init__(self, input_dim, theta_dim, encoding_dim, angles, tanh=False, name="scalable_data_reuploading"):
         super(ScalableDataReuploadingController, self).__init__(name=name)
-        self.input_dim = input_dim # dimension of input vector
-        self.theta_dim = theta_dim # dimension of variational params vector
-        self.encoding_dim = encoding_dim # number of repetitions of encoding
+        self.input_dim = input_dim
+        self.theta_dim = theta_dim
+        self.encoding_dim = encoding_dim
 
-        # PQC parameters
         theta_init = tf.random_uniform_initializer(minval=0., maxval=np.pi)
         self.theta = tf.Variable(
             initial_value=theta_init(shape=(1, theta_dim), dtype=tf.dtypes.float32),
             trainable=True, name="thetas"
         )
 
-        # trainable weights on input variables
         lmbd_init = tf.ones(shape=(1, input_dim*encoding_dim))
         self.lmbd = tf.Variable(
             initial_value=lmbd_init, dtype=tf.dtypes.float32,
@@ -31,20 +29,19 @@ class ScalableDataReuploadingController(tf.keras.layers.Layer):
         )
 
         alphabetical_angles = sorted(angles)
-        # re-ordering of indices to match order of expectation_layer.symbols
         self.indices = tf.constant([alphabetical_angles.index(a) for a in angles])
-        self.tanh = tanh # apply an activation on the encoding angles
+        self.tanh = tanh
 
     def call(self, inputs):
-        output = tf.repeat(self.theta,repeats=tf.shape(inputs)[0],axis=0)
-        repeat_inputs = tf.repeat(inputs,repeats=self.encoding_dim,axis=1)
-        repeat_lmbd = tf.repeat(self.lmbd,repeats=tf.shape(inputs)[0],axis=0)
+        output = tf.repeat(self.theta, repeats=tf.shape(inputs)[0], axis=0)
+        repeat_inputs = tf.repeat(inputs, repeats=self.encoding_dim, axis=1)
+        repeat_lmbd = tf.repeat(self.lmbd, repeats=tf.shape(inputs)[0], axis=0)
 
         if self.tanh:
             output = tf.concat([output, tf.keras.layers.Activation('tanh')(tf.math.multiply(repeat_inputs, repeat_lmbd))], 1)
         else:
             output = tf.concat([output, tf.math.multiply(repeat_inputs, repeat_lmbd)], 1)
-        output = tf.gather(output, self.indices, axis=1) # re-ordering of indices to match order of expectation_layer.symbols
+        output = tf.gather(output, self.indices, axis=1)
         return output
 
 

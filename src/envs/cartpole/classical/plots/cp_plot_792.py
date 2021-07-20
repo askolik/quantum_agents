@@ -10,16 +10,8 @@ params = 792
 
 
 hps = {
-    'learning_rate': 0.001,
-    'update_after': 5, 'update_target_after': 5, 'batch_size': 64}
-plot_avg_vals(
-    'scores', 5000, 10,
-     bak_path + f'cartpole_classical/params_{params}/', '', 'g', hps)
-
-
-hps = {
     'learning_rate': 0.0001,
-    'update_after': 5, 'update_target_after': 5, 'batch_size': 64}
+    'update_after': 5, 'update_target_after': 5, 'batch_size': 64, 'use_negative_rewards': None}
 plot_avg_vals(
     'scores', 5000, 10,
      bak_path + f'cartpole_classical/params_{params}/', '', 'b', hps)
@@ -27,23 +19,15 @@ plot_avg_vals(
 
 hps = {
     'learning_rate': 0.001,
-    'update_after': 5, 'update_target_after': 5, 'batch_size': 32}
+    'update_after': 5, 'update_target_after': 5, 'batch_size': 32, 'use_negative_rewards': None}
 plot_avg_vals(
     'scores', 5000, 10,
      bak_path + f'cartpole_classical/params_{params}/', '', 'orange', hps)
 
 
 hps = {
-    'learning_rate': 0.001,
-    'update_after': 5, 'update_target_after': 10, 'batch_size': 64}
-plot_avg_vals(
-    'scores', 5000, 10,
-     bak_path + f'cartpole_classical/params_{params}/', '', 'red', hps)
-
-
-hps = {
     'learning_rate': 0.0001,
-    'update_after': 5, 'update_target_after': 10, 'batch_size': 64}
+    'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': None}
 plot_avg_vals(
     'scores', 5000, 10,
      bak_path + f'cartpole_classical/params_{params}/', '', 'purple', hps)
@@ -51,44 +35,60 @@ plot_avg_vals(
 
 hps = {
     'learning_rate': 0.001,
-    'update_after': 10, 'update_target_after': 20, 'batch_size': 64}
+    'update_after': 10, 'update_target_after': 20, 'batch_size': 32, 'use_negative_rewards': None}
 plot_avg_vals(
     'scores', 5000, 10,
      bak_path + f'cartpole_classical/params_{params}/', '', 'grey', hps)
 
 
 hps = {
-    'learning_rate': 0.001,
-    'update_after': 10, 'update_target_after': 20, 'batch_size': 32}
-plot_avg_vals(
-    'scores', 5000, 10,
-     bak_path + f'cartpole_classical/params_{params}/', '', 'black', hps)
-
-
-hps = {
     'learning_rate': 0.0001,
-    'update_after': 10, 'update_target_after': 20, 'batch_size': 32}
+    'update_after': 10, 'update_target_after': 20, 'batch_size': 32, 'use_negative_rewards': None}
 plot_avg_vals(
     'scores', 5000, 10,
      bak_path + f'cartpole_classical/params_{params}/', '', 'yellow', hps)
 
 
+hps = {
+    'learning_rate': 0.001,
+    'update_after': 5, 'update_target_after': 5, 'batch_size': 64, 'use_negative_rewards': None}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{params}/', '', 'g', hps)
+
+hps = {
+    'learning_rate': 0.001,
+    'update_after': 10, 'update_target_after': 20, 'batch_size': 64, 'use_negative_rewards': None}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{params}/', '', 'black', hps)
+
+### BEST ###
+hps = {
+    'learning_rate': 0.001,
+    'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': None}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{params}/', '', 'red', hps)
+
+
+### BEST negative reward ###
+hps = {
+    'learning_rate': 0.001,
+    'update_after': 5, 'update_target_after': 5, 'batch_size': 64, 'use_negative_rewards': True}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{params}/', '', 'chartreuse', hps)
+
+
 # hps = {
 #     'learning_rate': 0.001,
-#     'update_after': 5, 'update_target_after': 5, 'batch_size': 32}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{params}/', '', 'chartreuse', hps)
-#
-#
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 5, 'update_target_after': 10, 'batch_size': 32}
+#     'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': True}
 # plot_avg_vals(
 #     'scores', 5000, 10,
 #      bak_path + f'cartpole_classical/params_{params}/', '', 'magenta', hps)
-#
-#
+
+
 # hps = {
 #     'learning_rate': 0.0001,
 #     'update_after': 5, 'update_target_after': 10, 'batch_size': 64}
