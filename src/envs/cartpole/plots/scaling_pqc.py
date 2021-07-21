@@ -15,6 +15,14 @@ plot_avg_vals(
     {'data_reuploading': True, 'n_layers': 5, 'train_weights': True, 'train_data_scaling': True}, plot_to=plot_to)
 
 
+depth = 5
+plot_avg_vals(
+    'scores', 5000, 10,
+    bak_path + f'cartpole/depth_{depth}_mse/', '5 layers', 'darkgreen',
+    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+     'batch_size': 32}, plot_to=plot_to)
+
+
 depth = 10
 plot_avg_vals(
     'scores', 5000, 10,
