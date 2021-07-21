@@ -38,31 +38,25 @@ plot_to = 2500
 #     'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': None}
 # plot_avg_vals(
 #     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{1702}/', 'NN, 1702 params', 'red', hps, plot_to=plot_to)
-#
-#
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': None}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{792}/', 'NN, 792 params', 'chartreuse', hps, plot_to=plot_to)
+#      bak_path + f'cartpole_classical/params_{1702}/', 'NN, 1702 params', 'chartreuse', hps, plot_to=plot_to)
 
 
+# 2000
+hps = {
+    'learning_rate': 0.01,
+    'update_after': 5, 'update_target_after': 10, 'batch_size': 16, 'use_negative_rewards': False}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{562}/', '(20, 20), 562', 'red', hps, plot_to=plot_to)
+
+
+# 590
 hps = {
     'learning_rate': 0.001,
     'update_after': 1, 'update_target_after': 1, 'batch_size': 64, 'use_negative_rewards': False}
 plot_avg_vals(
     'scores', 5000, 10,
-     bak_path + f'cartpole_classical/params_{770}/', 'NN, 770 params', 'g', hps, plot_to=plot_to)
-
-
-depth = 10
-plot_avg_vals(
-    'scores', 5000, 10,
-    bak_path + f'cartpole/depth_{depth}_mse/', 'PQC, 10 layers', 'b',
-    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-     'batch_size': 64}, plot_to=plot_to)
+     bak_path + f'cartpole_classical/params_{770}/', '(24, 24), 770', 'g', hps, plot_to=plot_to)
 
 
 plt.xlabel("Episode")
