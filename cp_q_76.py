@@ -18,7 +18,7 @@ hyperparams = {
     'learning_rate': [0.001],
     'learning_rate_in': [0.001],
     'learning_rate_out': [0.1],
-    'circuit_depth': [5],
+    'circuit_depth': [17],
     'epsilon_schedule': ['fast'],
     'reps': 10,
     'env': Envs.CARTPOLE,

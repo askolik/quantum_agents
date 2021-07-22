@@ -161,29 +161,21 @@ plot_avg_vals(
 #      'batch_size': 64}, plot_to=plot_to)
 
 
-
-
-depth = 10
+depth = 5
 plot_avg_vals(
     'scores', 5000, 10,
-    path + f'cartpole/depth_{depth}_neg_reward/', '20 layers', 'red',
-    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.01, 'learning_rate_out': 0.1,
-     'batch_size': 64}, plot_to=plot_to)
-
-depth = 10
-plot_avg_vals(
-    'scores', 5000, 10,
-    path + f'cartpole/depth_{depth}_neg_reward/', '20 layers', 'g',
-    {'circuit_depth': depth, 'learning_rate': 0.01, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-     'batch_size': 64}, plot_to=plot_to)
-
-depth = 10
-plot_avg_vals(
-    'scores', 5000, 10,
-    path + f'cartpole/depth_{depth}_neg_reward/', '20 layers', 'orange',
+    path + f'cartpole/depth_{depth}_mse/', f'{depth} layers', 'purple',
     {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-     'batch_size': 64}, plot_to=plot_to)
+     'batch_size': 16}, plot_to=plot_to)
 
+
+colors = ['red', 'g', 'orange', 'grey', 'magenta']
+for depth in range(6, 10, 1):
+    plot_avg_vals(
+        'scores', 5000, 10,
+        path + f'cartpole/depth_scaling/', f'{depth} layers', colors.pop(),
+        {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+         'batch_size': 16, 'update_after': 10, 'update_target_after': 30}, plot_to=plot_to)
 
 
 plt.xlabel("Episode")

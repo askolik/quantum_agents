@@ -2,7 +2,7 @@ import tensorflow as tf
 from src.utils.limit_thread_usage import set_thread_usage_limit
 set_thread_usage_limit(10, tf)
 
-from config import BASE_PATH, Envs
+from config import BASE_PATH, ALICE_BASE_PATH, Envs, EncType
 from parallelize import parallelize_cp_q
 
 
@@ -18,7 +18,7 @@ hyperparams = {
     'learning_rate': [0.001],
     'learning_rate_in': [0.001],
     'learning_rate_out': [0.1],
-    'circuit_depth': [6],
+    'circuit_depth': [19],
     'epsilon_schedule': ['fast'],
     'reps': 10,
     'env': Envs.CARTPOLE,
