@@ -109,16 +109,13 @@ plot_avg_vals(
     'scores', 5000, 10,
      bak_path + f'cartpole_classical/params_{params}/', '', 'red', hps)
 
-
-
-
-
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 10, 'update_target_after': 30, 'batch_size': 64}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{params}/', '', 'magenta', hps)
+# solves a bit slower than BEST but with 200 average score
+hps = {
+    'learning_rate': 0.001,
+    'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': True}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{params}/', '', 'magenta', hps)
 
 # hps = {
 #     'learning_rate': 0.0001,
