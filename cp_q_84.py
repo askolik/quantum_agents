@@ -3,7 +3,8 @@ from src.utils.limit_thread_usage import set_thread_usage_limit
 set_thread_usage_limit(10, tf)
 
 from config import BASE_PATH, Envs
-from parallelize import parallelize_cp_c
+from parallelize import parallelize_cp_q
+
 
 hyperparams = {
     'episodes': [5000],
@@ -12,12 +13,13 @@ hyperparams = {
     'epsilon_decay': [0.99],
     'epsilon_min': [0.01],
     'gamma': [0.99],
-    'update_after': [5],
-    'update_target_after': [10],
-    'learning_rate': [0.01],
+    'update_after': [1],
+    'update_target_after': [1],
+    'learning_rate': [0.001],
+    'learning_rate_in': [0.001],
+    'learning_rate_out': [0.1],
+    'circuit_depth': [13],
     'epsilon_schedule': ['fast'],
-    'n_hidden_layers': [2],
-    'hidden_layer_config': [[22, 22]],
     'reps': 10,
     'env': Envs.CARTPOLE,
     'save': True,
@@ -26,4 +28,4 @@ hyperparams = {
 
 
 if __name__ == '__main__':
-    parallelize_cp_c(hyperparams, BASE_PATH + 'cartpole_classical/params_662/')
+    parallelize_cp_q(hyperparams, BASE_PATH + 'cartpole/depth_scaling/')

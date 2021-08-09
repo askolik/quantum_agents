@@ -49,6 +49,15 @@ plot_avg_vals(
      'learning_rate': 0.01})
 
 
+# 2000
+hps = {
+    'learning_rate': 0.01,
+    'update_after': 5, 'update_target_after': 10, 'batch_size': 16, 'use_negative_rewards': False}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{562}/', '(20, 20), 562', 'b', hps, plot_to=plot_to)
+
+
 # 850
 hps = {
     'learning_rate': 0.01,
@@ -74,6 +83,14 @@ hps = {
 plot_avg_vals(
     'scores', 5000, 10,
      bak_path + f'cartpole_classical/params_{886}/', '(26, 26), 886', 'purple', hps, plot_to=plot_to)
+
+
+hps = {
+    'learning_rate': 0.001,
+    'update_after': 1, 'update_target_after': 1, 'batch_size': 64}
+plot_avg_vals(
+    'scores', 5000, 10,
+     path + f'cartpole_classical/params_{1142}/', '(30, 30), 1142', 'orange', hps, plot_to=plot_to)
 
 
 plt.xlabel("Episode")

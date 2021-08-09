@@ -65,7 +65,7 @@ def plot_val_by_dir(val):
                 print(e)
 
 
-def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_to=None):
+def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_to=None, plt_obj=None):
     all_vals = []
     for file_name in os.listdir(path):
         if file_name[-13:] == 'scores.pickle' and file_name[:5] != 'dummy':
@@ -119,12 +119,20 @@ def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_
 
     sb.set_style("whitegrid")
 
-    if plot_to is not None:
-        sb.lineplot(list(range(plot_to)), mean_vals[:plot_to], color=color, label=label)
-        plt.fill_between(range(plot_to), fill_low[:plot_to], fill_high[:plot_to], color=color, lw=0, alpha=0.3)
+    if plt_obj:
+        if plot_to is not None:
+            plt_obj.plot(list(range(plot_to)), mean_vals[:plot_to], color=color, label=label)
+            plt_obj.fill_between(range(plot_to), fill_low[:plot_to], fill_high[:plot_to], color=color, lw=0, alpha=0.3)
+        else:
+            plt_obj.plt_obj(list(range(len(mean_vals))), mean_vals, color=color, label=label)
+            plt_obj.fill_between(range(len(error)), fill_low, fill_high, color=color, lw=0, alpha=0.3)
     else:
-        sb.lineplot(list(range(len(mean_vals))), mean_vals, color=color, label=label)
-        plt.fill_between(range(len(error)), fill_low, fill_high, color=color, lw=0, alpha=0.3)
+        if plot_to is not None:
+            sb.lineplot(list(range(plot_to)), mean_vals[:plot_to], color=color, label=label)
+            plt.fill_between(range(plot_to), fill_low[:plot_to], fill_high[:plot_to], color=color, lw=0, alpha=0.3)
+        else:
+            sb.lineplot(list(range(len(mean_vals))), mean_vals, color=color, label=label)
+            plt.fill_between(range(len(error)), fill_low, fill_high, color=color, lw=0, alpha=0.3)
 
     # plt.xlabel("Episode")
     # plt.ylabel("Score")
