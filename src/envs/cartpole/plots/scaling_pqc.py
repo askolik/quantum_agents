@@ -68,14 +68,37 @@ sb.set_style("whitegrid")
 subplts = [[i, j] for i in range(3) for j in range(2)][::-1]
 fig, axs = plt.subplots(3, 2)
 
+hp_dict = {
+    5: {'circuit_depth': 5, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+         'batch_size': 16, 'update_after': 1, 'update_target_after': 1},
+    10: {'circuit_depth': 10, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+         'batch_size': 64, 'update_after': 10, 'update_target_after': 30},
+    15: {'circuit_depth': 15, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+         'batch_size': 32, 'update_after': 10, 'update_target_after': 30},
+    20: {'circuit_depth': 20, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+         'batch_size': 16, 'update_after': 10, 'update_target_after': 30},
+    25: {'circuit_depth': 25, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+         'batch_size': 64, 'update_after': 10, 'update_target_after': 30},
+    30: {'circuit_depth': 30, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+         'batch_size': 64, 'update_after': 10, 'update_target_after': 30}
+}
+
+path_dict = {
+    5: bak_path + f'cartpole/depth_scaling/',
+    10: bak_path + f'cartpole/depth_10_mse/',
+    15: bak_path + f'cartpole/depth_15_mse/',
+    20: bak_path + f'cartpole/depth_20_mse/',
+    25: bak_path + f'cartpole/depth_25_mse/',
+    30: bak_path + f'cartpole/depth_scaling/'
+}
+
 for depth in [5, 10, 15, 20, 25, 30]:
     ax_coords = subplts.pop()
     curr_ax = axs[ax_coords[0], ax_coords[1]]
     plot_avg_vals(
         'scores', 5000, 10,
-        path + f'cartpole/depth_scaling/', f'{depth} ({depth * 4 * 3 + 2})', colors.pop(),
-        {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-         'batch_size': 16, 'update_after': 1, 'update_target_after': 1}, plot_to=plot_to, plt_obj=curr_ax)
+        path_dict[depth], f'{depth} ({depth * 4 * 3 + 2})', colors.pop(),
+        hp_dict[depth], plot_to=plot_to, plt_obj=curr_ax)
 
     curr_ax.legend()
 
@@ -91,4 +114,5 @@ for depth in [5, 10, 15, 20, 25, 30]:
 # # plt.ylim(ymax=200)
 # plt.legend()  # loc='lower right')
 fig.suptitle("PQCs, legend shows: # layers (# params)")
+fig.tight_layout()
 plt.show()
