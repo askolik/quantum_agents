@@ -7,7 +7,7 @@ from src.utils.plots import plot_avg_vals
 
 bak_path = '/home/andrea/BAK/vql/data/'
 path = '../../../../' + BASE_PATH
-plot_to = 3000
+plot_to = 1000
 
 
 # plot_avg_vals(

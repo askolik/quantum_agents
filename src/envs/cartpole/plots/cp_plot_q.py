@@ -132,19 +132,19 @@ plot_to = 5000
 #     '/home/andrea/BAK/vql/data/' + 'cartpole/cirq/good_hps/', '5 layers', 'g',
 #     {'data_reuploading': True, 'n_layers': 5, 'train_weights': True, 'train_data_scaling': True}, plot_to=plot_to)
 
-depth = 10
-
-plot_avg_vals(
-    'scores', 5000, 10,
-    path + f'cartpole/depth_{depth}_mse/', '10 layers', 'g',
-    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-     'update_after': 1, 'update_target_after': 1, 'batch_size': 64}, plot_to=plot_to)
-
-plot_avg_vals(
-    'scores', 5000, 10,
-    bak_path + f'cartpole/depth_{depth}_mse/', '10 layers', 'b',
-    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-     'batch_size': 64}, plot_to=plot_to)
+# depth = 10
+#
+# plot_avg_vals(
+#     'scores', 5000, 10,
+#     path + f'cartpole/depth_{depth}_mse/', '10 layers', 'g',
+#     {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+#      'update_after': 1, 'update_target_after': 1, 'batch_size': 64}, plot_to=plot_to)
+#
+# plot_avg_vals(
+#     'scores', 5000, 10,
+#     bak_path + f'cartpole/depth_{depth}_mse/', '10 layers', 'b',
+#     {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+#      'batch_size': 64}, plot_to=plot_to)
 
 
 # depth = 15
@@ -177,18 +177,18 @@ plot_avg_vals(
 #      'batch_size': 16}, plot_to=plot_to)
 
 
-# colors = ['red', 'g', 'orange', 'grey', 'magenta']
-# for depth in range(6, 10, 1):
-#     plot_avg_vals(
-#         'scores', 5000, 10,
-#         path + f'cartpole/depth_scaling/', f'{depth} layers', colors.pop(),
-#         {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-#          'batch_size': 16, 'update_after': 10, 'update_target_after': 30}, plot_to=plot_to)
+colors = ['red', 'g', 'orange', 'grey', 'magenta']
+for depth in range(1, 5, 1):
+    plot_avg_vals(
+        'scores', 5000, 10,
+        bak_path + f'cartpole/depth_scaling/', f'{depth} layers', colors.pop(),
+        {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+         'batch_size': 16, 'update_after': 1, 'update_target_after': 1}, plot_to=plot_to)
 
 
 plt.xlabel("Episode")
 plt.ylabel("Score")
-plt.title("PQCs with varying depth (preliminary)")
+plt.title("PQCs with varying depth")
 # plt.ylim(ymax=200)
 plt.legend()  # loc='lower right')
 plt.show()
