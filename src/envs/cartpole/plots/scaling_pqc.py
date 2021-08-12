@@ -7,7 +7,7 @@ from src.utils.plots import plot_avg_vals
 
 bak_path = '/home/andrea/BAK/vql/data/'
 path = '../../../../' + BASE_PATH
-plot_to = 1000
+plot_to = 5000
 
 
 # plot_avg_vals(
@@ -56,7 +56,7 @@ plot_to = 1000
 #      'batch_size': 64}, plot_to=plot_to)
 
 
-colors = ['g', 'b', 'orange', 'red', 'dimgrey', 'orchid', 'gold'][::-1]
+colors = ['g', 'b', 'orange', 'red', 'dimgrey', 'orchid', 'gold', 'purple'][::-1]
 # for depth in [5, 10, 15, 20, 25, 30][::-1]:  # range(5, 10, 1):
 #     plot_avg_vals(
 #         'scores', 5000, 10,
@@ -65,10 +65,12 @@ colors = ['g', 'b', 'orange', 'red', 'dimgrey', 'orchid', 'gold'][::-1]
 #          'batch_size': 16, 'update_after': 1, 'update_target_after': 1}, plot_to=plot_to)
 
 sb.set_style("whitegrid")
-subplts = [[i, j] for i in range(3) for j in range(2)][::-1]
-fig, axs = plt.subplots(3, 2)
+subplts = [[i, j] for i in range(4) for j in range(2)][::-1]
+fig, axs = plt.subplots(4, 2)
 
 hp_dict = {
+    3: {'circuit_depth': 3, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+         'batch_size': 16, 'update_after': 1, 'update_target_after': 1},
     5: {'circuit_depth': 5, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
          'batch_size': 16, 'update_after': 1, 'update_target_after': 1},
     10: {'circuit_depth': 10, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
@@ -84,6 +86,7 @@ hp_dict = {
 }
 
 path_dict = {
+    3: bak_path + f'cartpole/depth_scaling/',
     5: bak_path + f'cartpole/depth_scaling/',
     10: bak_path + f'cartpole/depth_10_mse/',
     15: bak_path + f'cartpole/depth_15_mse/',
@@ -92,7 +95,7 @@ path_dict = {
     30: bak_path + f'cartpole/depth_scaling/'
 }
 
-for depth in [5, 10, 15, 20, 25, 30]:
+for depth in [3, 5, 10, 15, 20, 25, 30]:
     ax_coords = subplts.pop()
     curr_ax = axs[ax_coords[0], ax_coords[1]]
     plot_avg_vals(
