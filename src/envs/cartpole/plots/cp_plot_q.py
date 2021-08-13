@@ -178,12 +178,12 @@ plot_to = 5000
 
 
 colors = ['red', 'g', 'orange', 'grey', 'magenta']
-for depth in range(1, 5, 1):
+for depth in range(30, 31, 1):
     plot_avg_vals(
         'scores', 5000, 10,
-        bak_path + f'cartpole/depth_scaling/', f'{depth} layers', colors.pop(),
+        path + f'cartpole/depth_scaling/', f'{depth} layers', colors.pop(),
         {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-         'batch_size': 16, 'update_after': 1, 'update_target_after': 1}, plot_to=plot_to)
+         'batch_size': 32, 'update_after': 10, 'update_target_after': 30}, plot_to=plot_to)
 
 
 plt.xlabel("Episode")

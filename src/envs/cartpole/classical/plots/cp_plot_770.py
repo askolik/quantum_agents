@@ -56,38 +56,39 @@ plot_avg_vals(
     'scores', 5000, 10,
      bak_path + f'cartpole_classical/params_{params}/', '', 'grey', hps)
 
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': None}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{params}/', '', 'red', hps)
-#
-#
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 5, 'update_target_after': 5, 'batch_size': 64, 'use_negative_rewards': True}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{params}/', '', 'chartreuse', hps)
-#
 
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': True}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{params}/', '', 'magenta', hps)
+hps = {
+    'learning_rate': 0.001,
+    'update_after': 5, 'update_target_after': 10, 'batch_size': 32, 'use_negative_rewards': False}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{params}/', '', 'red', hps)
 
 
-# hps = {
-#     'learning_rate': 0.0001,
-#     'update_after': 5, 'update_target_after': 10, 'batch_size': 64}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{params}/', '', 'darkblue', hps)
-#
-#
+hps = {
+    'learning_rate': 0.01,
+    'update_after': 5, 'update_target_after': 10, 'batch_size': 32, 'use_negative_rewards': False}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{params}/', '', 'chartreuse', hps)
+
+
+hps = {
+    'learning_rate': 0.001,
+    'update_after': 1, 'update_target_after': 1, 'batch_size': 32, 'use_negative_rewards': False}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{params}/', '', 'magenta', hps)
+
+
+hps = {
+    'learning_rate': 0.01,
+    'update_after': 1, 'update_target_after': 1, 'batch_size': 32}
+plot_avg_vals(
+    'scores', 5000, 10,
+     bak_path + f'cartpole_classical/params_{params}/', '', 'darkblue', hps)
+
+
 # hps = {
 #     'learning_rate': 0.0001,
 #     'update_after': 1, 'update_target_after': 1, 'batch_size': 32}
