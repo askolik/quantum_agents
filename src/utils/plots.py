@@ -96,6 +96,9 @@ def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_
                         filled_vals = np.ones(shape=min_val) * data[-1]
                         filled_vals[:len(data)] = data
 
+                        # plt.plot(filled_vals)
+                        # plt.show()
+
                         if len(all_vals) < avg_over:
                             all_vals.append(filled_vals)
                         else:

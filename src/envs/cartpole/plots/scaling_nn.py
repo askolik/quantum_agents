@@ -117,9 +117,12 @@ subplts = [[i, j] for i in range(3) for j in range(2)][::-1]
 fig, axs = plt.subplots(3, 2)
 
 hp_dict = {
-    365: {
-        'learning_rate': 0.01, 'update_after': 5, 'update_target_after': 10,
+    182: {
+        'learning_rate': 0.001, 'update_after': 1, 'update_target_after': 1,
         'batch_size': 64, 'use_negative_rewards': False},
+    347: {
+        'learning_rate': 0.001, 'update_after': 1, 'update_target_after': 1,
+        'batch_size': 16, 'use_negative_rewards': False},
     562: {
         'learning_rate': 0.001, 'update_after': 1, 'update_target_after': 1,
         'batch_size': 64, 'use_negative_rewards': False},
@@ -135,23 +138,24 @@ hp_dict = {
 }
 
 label_dict = {
-    365: '(15, 16), 365',
+    182: '(10, 10), 182',
+    347: '(15, 15), 347',
     562: '(20, 20), 562',
     770: '(24, 24), 770',
     1142: '(30, 30), 1142',
     4610: '(64, 64), 4610'
 }
 
-ax_coords = subplts.pop()
-curr_ax = axs[ax_coords[0], ax_coords[1]]
-plot_avg_vals(
-    'scores', 5000, 10,
-    bak_path + 'cartpole_classical/hp_search/', '(9, 10), 167', colors.pop(),
-    {'l1_units': 9, 'l2_units': 10, 'update_target_after': 10, 'update_after': 5, 'batch_size': 16,
-     'learning_rate': 0.01}, plot_to=4000, plt_obj=curr_ax)
-curr_ax.legend()
+# ax_coords = subplts.pop()
+# curr_ax = axs[ax_coords[0], ax_coords[1]]
+# plot_avg_vals(
+#     'scores', 5000, 10,
+#     bak_path + 'cartpole_classical/hp_search/', '(9, 10), 167', colors.pop(),
+#     {'l1_units': 9, 'l2_units': 10, 'update_target_after': 10, 'update_after': 5, 'batch_size': 16,
+#      'learning_rate': 0.01}, plot_to=4000, plt_obj=curr_ax)
+# curr_ax.legend()
 
-for params in [365, 562, 770, 1142, 4610]:
+for params in [182, 347, 562, 770, 1142, 4610]:
     ax_coords = subplts.pop()
     curr_ax = axs[ax_coords[0], ax_coords[1]]
     plot_avg_vals(
@@ -161,6 +165,6 @@ for params in [365, 562, 770, 1142, 4610]:
 
     curr_ax.legend()
 
-fig.suptitle("NNs, legend shows: (hidden layer units), # params\n(notice different x-axis in first subplot)")
+# fig.suptitle("NNs, legend shows: (hidden layer units), # params")
 fig.tight_layout()
 plt.show()

@@ -10,52 +10,69 @@ from src.utils.utils import generate_all_bitstrings_of_size
 
 
 class ScalableDataReuploadingController(tf.keras.layers.Layer):
-    def __init__(self, input_dim, theta_dim, encoding_dim, angles, tanh=False, name="scalable_data_reuploading"):
+    def __init__(
+            self,
+            num_input_params,
+            num_params,
+            circuit_depth,
+            params,
+            tanh=False,
+            trainable_scaling=True,
+            use_reuploading=True,
+            name="scalable_data_reuploading"):
         super(ScalableDataReuploadingController, self).__init__(name=name)
-        self.input_dim = input_dim
-        self.theta_dim = theta_dim
-        self.encoding_dim = encoding_dim
+        self.num_params = num_params
+        self.circuit_depth = circuit_depth
+        self.use_reuploading = use_reuploading
+        self.num_input_params = num_input_params
+        if self.use_reuploading:
+            self.num_input_params *= circuit_depth
 
-        theta_init = tf.random_uniform_initializer(minval=0., maxval=np.pi)
-        self.theta = tf.Variable(
-            initial_value=theta_init(shape=(1, theta_dim), dtype=tf.dtypes.float32),
-            trainable=True, name="thetas"
+        param_init = tf.random_uniform_initializer(minval=0., maxval=np.pi)
+        self.params = tf.Variable(
+            initial_value=param_init(shape=(1, num_params), dtype=tf.dtypes.float32),
+            trainable=True, name="params"
         )
 
-        lmbd_init = tf.ones(shape=(1, input_dim*encoding_dim))
-        self.lmbd = tf.Variable(
-            initial_value=lmbd_init, dtype=tf.dtypes.float32,
-            trainable=True, name="lambdas"
+        input_param_init = tf.ones(shape=(1, self.num_input_params))
+        self.input_params = tf.Variable(
+            initial_value=input_param_init, dtype=tf.dtypes.float32,
+            trainable=trainable_scaling, name="input_params"
         )
 
-        alphabetical_angles = sorted(angles)
-        self.indices = tf.constant([alphabetical_angles.index(a) for a in angles])
+        alphabetical_params = sorted(params)
+        self.indices = tf.constant([alphabetical_params.index(a) for a in params])
         self.tanh = tanh
 
     def call(self, inputs):
-        output = tf.repeat(self.theta, repeats=tf.shape(inputs)[0], axis=0)
-        repeat_inputs = tf.repeat(inputs, repeats=self.encoding_dim, axis=1)
-        repeat_lmbd = tf.repeat(self.lmbd, repeats=tf.shape(inputs)[0], axis=0)
+        output = tf.repeat(self.params, repeats=tf.shape(inputs)[0], axis=0)
+
+        input_repeats = self.circuit_depth if self.use_reuploading else 1
+        repeat_inputs = tf.repeat(inputs, repeats=input_repeats, axis=1)
+        repeat_inp_weights = tf.repeat(self.input_params, repeats=tf.shape(inputs)[0], axis=0)
 
         if self.tanh:
-            output = tf.concat([output, tf.keras.layers.Activation('tanh')(tf.math.multiply(repeat_inputs, repeat_lmbd))], 1)
+            output = tf.concat([output, tf.keras.layers.Activation('tanh')(tf.math.multiply(repeat_inputs, repeat_inp_weights))], 1)
         else:
-            output = tf.concat([output, tf.math.multiply(repeat_inputs, repeat_lmbd)], 1)
+            output = tf.concat([output, tf.math.multiply(repeat_inputs, repeat_inp_weights)], 1)
         output = tf.gather(output, self.indices, axis=1)
         return output
 
 
 class TrainableRescaling(tf.keras.layers.Layer):
-    def __init__(self, input_dim):
+    def __init__(self, input_dim, trainable_output, output_factor):
         super(TrainableRescaling, self).__init__()
         self.input_dim = input_dim
+        self.output_factor = output_factor
         self.w = tf.Variable(
-            initial_value=tf.ones(shape=(1,input_dim)), dtype=tf.dtypes.float32,
-            trainable=True, name="obs-weights")
+            initial_value=tf.ones(shape=(1, input_dim)), dtype=tf.dtypes.float32,
+            trainable=trainable_output, name="output_params")
 
     def call(self, inputs):
-        # scale expectation values to [0, 1] and multiply with weights
-        return tf.math.multiply((inputs+1)/2, tf.repeat(self.w, repeats=tf.shape(inputs)[0], axis=0))
+        return tf.math.multiply(
+            tf.math.multiply((inputs+1)/2,
+                             tf.repeat(self.w, repeats=tf.shape(inputs)[0], axis=0)),
+            self.output_factor)
 
 
 def state_to_circuit(state, depth=2, env_name=None, enc_type=None):
@@ -171,33 +188,52 @@ def hwe_layer(qubits, symbols):
     return circuit
 
 
-def generate_circuit(n_qubits, n_layers, qubits):
+def generate_circuit(n_qubits, n_layers, qubits, use_reuploading=True):
     theta_dim = 2 * n_qubits * n_layers
     params = sympy.symbols('theta(0:' + str(theta_dim) + ')')
-    inputs = sympy.symbols(
-        'x(0:' + str(n_qubits) + ')' + '(0:' + str(n_layers) + ')')
+
+    if use_reuploading:
+        inputs = sympy.symbols(
+            'x(0:' + str(n_qubits) + ')' + '(0:' + str(n_layers) + ')')
+    else:
+        inputs = sympy.symbols('x(0:' + str(n_qubits) + ')')
 
     circuit = cirq.Circuit()
     for l in range(n_layers):
-        for i in range(n_qubits):
-            circuit += cirq.rx(inputs[l + i * n_layers])(qubits[i])
+        if use_reuploading:
+            for i in range(n_qubits):
+                circuit += cirq.rx(inputs[l + i * n_layers])(qubits[i])
+        if not use_reuploading and l == 0:
+            for i in range(n_qubits):
+                circuit += cirq.rx(inputs[i])(qubits[i])
+
         circuit += hwe_layer(qubits, params[l * n_qubits * 2:(l + 1) * n_qubits * 2])
 
     return circuit, theta_dim, params, inputs
 
 
-def generate_model(n_qubits, n_layers, circuit, theta_dim, params, inputs, observables, target):
+def generate_model(
+        n_qubits,
+        n_layers,
+        circuit,
+        num_params,
+        params,
+        inputs,
+        observables,
+        target,
+        trainable_scaling,
+        use_reuploading,
+        trainable_output,
+        output_factor):
     input_tensor = tf.keras.Input(shape=(n_qubits), dtype=tf.dtypes.float32, name='input')
 
-    # Define input quantum state
     input_q_state = tf.keras.Input(shape=(), dtype=tf.string, name='quantum_state')
 
-    # Define encoding layer
     encoding_layer = ScalableDataReuploadingController(
-        input_dim=n_qubits, theta_dim=theta_dim, encoding_dim=n_layers,
-        angles=[str(param) for param in params] + [str(x) for x in inputs], tanh=True)
+        num_input_params=n_qubits, num_params=num_params, circuit_depth=n_layers,
+        params=[str(param) for param in params] + [str(x) for x in inputs], tanh=True,
+        trainable_scaling=trainable_scaling, use_reuploading=use_reuploading)
 
-    # Define Controlled PQC
     expectation_layer = tfq.layers.ControlledPQC(
         circuit, differentiator=tfq.differentiators.Adjoint(),
         operators=observables, name="PQC")
@@ -206,12 +242,11 @@ def generate_model(n_qubits, n_layers, circuit, theta_dim, params, inputs, obser
     if target:
         prepend = "Target"
 
-    # Define post-processing
     expectation_values = expectation_layer(
         [input_q_state, encoding_layer(input_tensor)])
 
     process = tf.keras.Sequential([
-        TrainableRescaling(len(observables))
+        TrainableRescaling(len(observables), trainable_output, output_factor)
     ], name=prepend + "Q-values")
 
     Q_values = process(expectation_values)
