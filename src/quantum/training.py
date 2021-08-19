@@ -418,11 +418,6 @@ class QLearningCartpole(QLearning):
         self.w_input, self.w_var, self.w_output = 1, 0, 2
         self.model, self.target_model, self.circuit = self.initialize_models()
 
-        # if ('input_params' not in self.model.trainable_variables[self.w_input].name) or (
-        #         'params' not in self.model.trainable_variables[self.w_var].name) or (
-        #         'output_params' not in self.model.trainable_variables[self.w_output].name):
-        #     raise ValueError("Wrong indexing of optimizers parameters.")
-
     def initialize_readout(self):
         qubits = [cirq.GridQubit(0, i) for i in range(self.observation_space)]
         return [
