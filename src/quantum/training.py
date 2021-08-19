@@ -410,14 +410,18 @@ class QLearningCartpole(QLearning):
         self.optimizer_output = tf.keras.optimizers.Adam(learning_rate=self.learning_rate_out)
         self.loss_fun = tf.keras.losses.mse
         self.use_negative_rewards = hyperparams.get('use_negative_rewards', False)
+        self.use_reuploading = hyperparams.get('use_reuploading', True)
+        self.trainable_scaling = hyperparams.get('trainable_scaling', True)
+        self.trainable_output = hyperparams.get('trainable_output', True)
+        self.output_factor = hyperparams.get('output_factor', 1)
 
         self.w_input, self.w_var, self.w_output = 1, 0, 2
         self.model, self.target_model, self.circuit = self.initialize_models()
 
-        if ('lambdas' not in self.model.trainable_variables[self.w_input].name) or (
-                'thetas' not in self.model.trainable_variables[self.w_var].name) or (
-                'obs-weights' not in self.model.trainable_variables[self.w_output].name):
-            raise ValueError("Wrong indexing of optimizers parameters.")
+        # if ('input_params' not in self.model.trainable_variables[self.w_input].name) or (
+        #         'params' not in self.model.trainable_variables[self.w_var].name) or (
+        #         'output_params' not in self.model.trainable_variables[self.w_output].name):
+        #     raise ValueError("Wrong indexing of optimizers parameters.")
 
     def initialize_readout(self):
         qubits = [cirq.GridQubit(0, i) for i in range(self.observation_space)]
@@ -429,17 +433,22 @@ class QLearningCartpole(QLearning):
         circuit, param_dim, param_symbols, input_symbols = self.create_circuit()
         model = generate_model(
             self.observation_space, self.circuit_depth, circuit,
-            param_dim, param_symbols, input_symbols, self.readout_op, False)
+            param_dim, param_symbols, input_symbols, self.readout_op, False,
+            self.trainable_scaling, self.use_reuploading,
+            self.trainable_output, self.output_factor)
         target_model = generate_model(
             self.observation_space, self.circuit_depth, circuit,
-            param_dim, param_symbols, input_symbols, self.readout_op, True)
+            param_dim, param_symbols, input_symbols, self.readout_op, True,
+            self.trainable_scaling, self.use_reuploading,
+            self.trainable_output, self.output_factor)
         target_model.set_weights(model.get_weights())
 
         return model, target_model, circuit
 
     def create_circuit(self):
         circuit, param_dim, param_symbols, input_symbols = generate_circuit(
-            self.observation_space, self.circuit_depth, self.qubits)
+            self.observation_space, self.circuit_depth, self.qubits,
+            use_reuploading=self.use_reuploading)
         return circuit, param_dim, param_symbols, input_symbols
 
     def save_env_data(self, state_history):
@@ -489,10 +498,19 @@ class QLearningCartpole(QLearning):
             q_values_masked = tf.reduce_sum(tf.multiply(q_values, masks), axis=1)
             loss = self.loss_fun(target_q_values, q_values_masked)
 
+        optimizers = [self.optimizer]
+        weights = [self.w_var]
+
+        if self.trainable_scaling:
+            optimizers.append(self.optimizer_input)
+            weights.append(self.w_input)
+
+        if self.trainable_output:
+            optimizers.append(self.optimizer_output)
+            weights.append(self.w_output if self.trainable_scaling else self.w_input)
+
         grads = tape.gradient(loss, self.model.trainable_variables)
-        for optimizer, w in zip(
-                [self.optimizer_input, self.optimizer, self.optimizer_output],
-                [self.w_input, self.w_var, self.w_output]):
+        for optimizer, w in zip(optimizers, weights):
             optimizer.apply_gradients([(grads[w], self.model.trainable_variables[w])])
 
     def perform_episodes(self):
@@ -512,6 +530,10 @@ class QLearningCartpole(QLearning):
             'learning_rate_in': self.learning_rate_in,
             'learning_rate_out': self.learning_rate_out,
             'use_negative_rewards': self.use_negative_rewards,
+            'use_reuploading': self.use_reuploading,
+            'trainable_scaling': self.trainable_scaling,
+            'trainable_output': self.trainable_output,
+            'output_factor': self.output_factor,
             'env_solved_at': []
         }
 
@@ -535,7 +557,6 @@ class QLearningCartpole(QLearning):
 
                 state, reward, done, _ = self.env.step(action)
 
-                # NNs perform much better when failed transitions get negative reward
                 if self.use_negative_rewards:
                     if done and iteration < 199:
                         reward *= -1

@@ -27,27 +27,33 @@ from src.utils.plots import plot_avg_vals
 
 # plot_avg_vals(
 #     'scores', 5000, 10,
-#     '/home/andrea/BAK/vql/data/' + 'cartpole/cirq/good_hps/', 'w/ data re-uploading', 'g',
+#     '/home/andrea/BAK/vql/data/' + 'cartpole/cirq/good_hps/', 'trainable output weights', 'g',
 #     {'data_reuploading': True, 'n_layers': 5, 'train_weights': True, 'train_data_scaling': True})
 
 
+plot_avg_vals(
+    'scores', 5000, 10,
+    '/home/andrea/BAK/vql/data/' + 'cartpole/depth_scaling/', 'trainable output weights', 'g',
+    {'circuit_depth': 5, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+     'batch_size': 16, 'update_after': 1, 'update_target_after': 1})
 
 
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#     '/home/andrea/BAK/vql/data/' + 'cartpole/cirq/data_scaling_only/', 'fixed range [0, 1]', 'purple',
-#     {'data_reuploading': True, 'n_layers': 5, 'train_weights': False, 'train_data_scaling': True})
-#
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#     '../../../../' + BASE_PATH + 'cartpole/fixed_range_90/', 'fixed range [0, 90]', 'gold',
-#     {'data_reuploading': True, 'n_layers': 5, 'train_weights': False, 'train_data_scaling': True})
-#
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#     '/home/andrea/BAK/vql/data/' + 'cartpole/fixed_output/', 'fixed range [0, 180]', 'magenta',
-#     {'data_reuploading': True, 'n_layers': 5, 'train_weights': False, 'train_data_scaling': True})
-#
+
+plot_avg_vals(
+    'scores', 5000, 10,
+    '/home/andrea/BAK/vql/data/' + 'cartpole/cirq/data_scaling_only/', 'fixed range [0, 1]', 'purple',
+    {'data_reuploading': True, 'n_layers': 5, 'train_weights': False, 'train_data_scaling': True})
+
+plot_avg_vals(
+    'scores', 5000, 10,
+    '/home/andrea/BAK/vql/data/' + 'cartpole/fixed_range_90/', 'fixed range [0, 90]', 'gold',
+    {'data_reuploading': True, 'n_layers': 5, 'train_weights': False, 'train_data_scaling': True})
+
+plot_avg_vals(
+    'scores', 5000, 10,
+    '/home/andrea/BAK/vql/data/' + 'cartpole/fixed_output/', 'fixed range [0, 180]', 'magenta',
+    {'data_reuploading': True, 'n_layers': 5, 'train_weights': False, 'train_data_scaling': True})
+
 # plot_avg_vals(
 #     'scores', 5000, 10,
 #     '/home/andrea/BAK/vql/data/' + 'cartpole/cirq/train_weights/', 'w/o trainable scaling', 'crimson',
@@ -122,9 +128,9 @@ from src.utils.plots import plot_avg_vals
 #     {'l1_units': 9, 'l2_units': 10, 'update_target_after': 20, 'update_after': 5, 'batch_size': 16, 'learning_rate': 0.01})
 
 
-bak_path = '/home/andrea/BAK/vql/data/'
-path = '../../../../' + BASE_PATH
-plot_to = 5000
+# bak_path = '/home/andrea/BAK/vql/data/'
+# path = '../../../../' + BASE_PATH
+# plot_to = 5000
 
 
 # plot_avg_vals(
@@ -177,18 +183,18 @@ plot_to = 5000
 #      'batch_size': 16}, plot_to=plot_to)
 
 
-colors = ['red', 'g', 'orange', 'grey', 'magenta']
-for depth in range(30, 31, 1):
-    plot_avg_vals(
-        'scores', 5000, 10,
-        path + f'cartpole/depth_scaling/', f'{depth} layers', colors.pop(),
-        {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-         'batch_size': 32, 'update_after': 10, 'update_target_after': 30}, plot_to=plot_to)
+# colors = ['red', 'g', 'orange', 'grey', 'magenta']
+# for depth in range(2, 3, 1):
+#     plot_avg_vals(
+#         'scores', 5000, 10,
+#         bak_path + f'cartpole/depth_scaling/', f'{depth} layers', colors.pop(),
+#         {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
+#          'batch_size': 32, 'update_after': 10, 'update_target_after': 30}, plot_to=plot_to)
 
 
 plt.xlabel("Episode")
 plt.ylabel("Score")
-plt.title("PQCs with varying depth")
+# plt.title("PQCs with varying depth")
 # plt.ylim(ymax=200)
 plt.legend()  # loc='lower right')
 plt.show()

@@ -269,7 +269,11 @@ def _run_cp_q(args):
         'learning_rate': learning_rate,
         'learning_rate_in': learning_rate_in,
         'learning_rate_out': learning_rate_out,
-        'use_negative_rewards': hyperparams.get('use_negative_rewards', False)
+        'use_negative_rewards': hyperparams.get('use_negative_rewards', False),
+        'use_reuploading': hyperparams.get('use_reuploading', True),
+        'trainable_scaling': hyperparams.get('trainable_scaling', True),
+        'trainable_output': hyperparams.get('trainable_output', True),
+        'output_factor': hyperparams.get('output_factor', 1)
     }
 
     for i in range(hyperparams.get('reps', 1)):

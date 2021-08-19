@@ -95,7 +95,7 @@ path_dict = {
     30: path + f'cartpole/depth_scaling/'
 }
 
-for depth in [3, 5, 10, 15, 20, 25]:
+for depth in [5, 10, 15, 20, 25, 30]:
     ax_coords = subplts.pop()
     curr_ax = axs[ax_coords[0], ax_coords[1]]
     plt_to = 4000 if depth == 3 else plot_to
@@ -117,6 +117,6 @@ for depth in [3, 5, 10, 15, 20, 25]:
 # plt.title("PQCs, # layers, (# params)")
 # # plt.ylim(ymax=200)
 # plt.legend()  # loc='lower right')
-fig.suptitle("PQCs, legend shows: # layers (# params)")
+# fig.suptitle("PQCs, legend shows: # layers (# params)")
 fig.tight_layout()
 plt.show()
