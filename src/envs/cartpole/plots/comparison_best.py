@@ -1,73 +1,19 @@
 
 import matplotlib.pyplot as plt
+import seaborn as sb
 from config import BASE_PATH
-from src.utils.plots import plot_avg_vals
-
+from src.utils.plots import plot_avg_vals, plot_by_model_name
 
 bak_path = '/home/andrea/BAK/vql/data/'
-path = '../../../../' + BASE_PATH
-plot_to = 2500
+sb.set_style("whitegrid")
 
-
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 10, 'update_target_after': 20, 'batch_size': 64, 'use_negative_rewards': None}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{1729}/', 'NN, 1729 params', 'orange', hps, plot_to=plot_to)
-#
-#
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': None}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{790}/', 'NN, 790 params', 'purple', hps, plot_to=plot_to)
-#
-#
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': None}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{405}/', 'NN, 405 params', 'magenta', hps, plot_to=plot_to)
-#
-#
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': None}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{1702}/', 'NN, 1702 params', 'red', hps, plot_to=plot_to)
-#
-#
-# hps = {
-#     'learning_rate': 0.001,
-#     'update_after': 5, 'update_target_after': 10, 'batch_size': 64, 'use_negative_rewards': None}
-# plot_avg_vals(
-#     'scores', 5000, 10,
-#      bak_path + f'cartpole_classical/params_{792}/', 'NN, 792 params', 'chartreuse', hps, plot_to=plot_to)
-
-
-hps = {
-    'learning_rate': 0.001,
-    'update_after': 1, 'update_target_after': 1, 'batch_size': 64, 'use_negative_rewards': False}
-plot_avg_vals(
-    'scores', 5000, 10,
-     bak_path + f'cartpole_classical/params_{770}/', 'NN, 770 params', 'g', hps, plot_to=plot_to)
-
-
-depth = 10
-plot_avg_vals(
-    'scores', 5000, 10,
-    bak_path + f'cartpole/depth_{depth}_mse/', 'PQC, 10 layers', 'b',
-    {'circuit_depth': depth, 'learning_rate': 0.001, 'learning_rate_in': 0.001, 'learning_rate_out': 0.1,
-     'batch_size': 64}, plot_to=plot_to)
-
+plot_by_model_name(
+    '2021-07-22_11-16-33_799_3', 'scores', bak_path + 'cartpole_classical/params_1142/', 'NN, (30, 30), 1142', 'b')
+plot_by_model_name('2021-07-21_14-47-56_967_9', 'scores', bak_path + 'cartpole/depth_scaling/', 'PQC, 5 (62)', 'orange')
 
 plt.xlabel("Episode")
 plt.ylabel("Score")
-plt.title("Comparison of best (so far) configurations")
+# plt.title("Comparison of best configurations")
 # plt.ylim(ymax=200)
 plt.legend()  # loc='lower right')
 plt.show()

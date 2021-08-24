@@ -67,12 +67,15 @@ def plot_val_by_dir(val):
 
 def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_to=None, plt_obj=None):
     all_vals = []
+    best_agent_solved_at = 10000000
+    best_agent_name = 'not found'
+    best_agent_meta = 'not found'
     for file_name in os.listdir(path):
         if file_name[-13:] == 'scores.pickle' and file_name[:5] != 'dummy':
             try:
                 with open(path + file_name.replace('scores', 'meta'), 'rb') as file:
                     meta = pickle.load(file)
-                    print(meta)
+                    # print(meta)
 
                 include_agent = True
                 for hp, value in hyperparams.items():
@@ -96,6 +99,11 @@ def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_
                         filled_vals = np.ones(shape=min_val) * data[-1]
                         filled_vals[:len(data)] = data
 
+                        if meta['env_solved_at'] and meta['env_solved_at'][0] < best_agent_solved_at:
+                            best_agent_solved_at = meta['env_solved_at'][0]
+                            best_agent_name = file_name
+                            best_agent_meta = meta
+
                         # plt.plot(filled_vals)
                         # plt.show()
 
@@ -110,6 +118,10 @@ def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_
     print(len(all_vals))
     if len(all_vals) == 0:
         pprint(hyperparams)
+
+    print("best agent:", best_agent_solved_at)
+    print("best agent name:", best_agent_name)
+    print("best agent meta:", best_agent_meta)
 
     clipped_vals = [x[:min_val] for x in all_vals]
     all_vals = clipped_vals
@@ -179,12 +191,11 @@ def plot_avg_score():
                 plt.show()
 
 
-def plot_by_model_name(model_name, val):
-    path = '../../../../' + BASE_PATH + 'cartpole/'
+def plot_by_model_name(model_name, val, path, label, color):
     with open(path + model_name + '_' + val + '.pickle', 'rb') as file:
         data = pickle.load(file)
         print(data)
 
-        # plt.plot(data)
+        plt.plot(data, label=label, color=color)
         # plt.title("Final {}: {}".format(val, data[-1]))
         # plt.show()
