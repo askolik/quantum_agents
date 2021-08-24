@@ -16,7 +16,6 @@ class ScalableDataReuploadingController(tf.keras.layers.Layer):
             num_params,
             circuit_depth,
             params,
-            tanh=False,
             trainable_scaling=True,
             use_reuploading=True,
             name="scalable_data_reuploading"):
@@ -42,7 +41,6 @@ class ScalableDataReuploadingController(tf.keras.layers.Layer):
 
         alphabetical_params = sorted(params)
         self.indices = tf.constant([alphabetical_params.index(a) for a in params])
-        self.tanh = tanh
 
     def call(self, inputs):
         output = tf.repeat(self.params, repeats=tf.shape(inputs)[0], axis=0)
@@ -51,10 +49,12 @@ class ScalableDataReuploadingController(tf.keras.layers.Layer):
         repeat_inputs = tf.repeat(inputs, repeats=input_repeats, axis=1)
         repeat_inp_weights = tf.repeat(self.input_params, repeats=tf.shape(inputs)[0], axis=0)
 
-        if self.tanh:
-            output = tf.concat([output, tf.keras.layers.Activation('tanh')(tf.math.multiply(repeat_inputs, repeat_inp_weights))], 1)
-        else:
-            output = tf.concat([output, tf.math.multiply(repeat_inputs, repeat_inp_weights)], 1)
+        output = tf.concat(
+            [
+                output,
+                tf.keras.layers.Activation('tanh')(tf.math.multiply(repeat_inputs, repeat_inp_weights))
+            ], 1)
+
         output = tf.gather(output, self.indices, axis=1)
         return output
 
@@ -110,8 +110,6 @@ def state_to_circuit_continuous(state_vec, depth, enc_type, scale_range=True):
         circuit = state_to_circuit_hidden_shift_boolean(scaled_state, depth, qubits)
     elif enc_type == EncType.CONT_X:
         circuit = state_to_circuit_cont_x(scaled_state, depth, qubits)
-    elif enc_type == EncType.CONT_YZ:
-        circuit = state_to_circuit_cont_yz(scaled_state, depth, qubits)
 
     return circuit
 
@@ -137,18 +135,6 @@ def state_to_circuit_cont_x(state, depth, qubits):
     for layer in range(depth):
         for i, qubit in enumerate(qubits):
             circuit.append(cirq.rx(state[i])(qubit))
-
-    return circuit
-
-
-def state_to_circuit_cont_yz(state, depth, qubits):
-    circuit = cirq.Circuit()
-    for layer in range(depth):
-        for i, qubit in enumerate(qubits):
-            circuit.append(cirq.ry(state[0])(qubit))
-            circuit.append(cirq.rz(state[1])(qubit))
-            circuit.append(cirq.ry(state[2])(qubit))
-            circuit.append(cirq.rz(state[3])(qubit))
 
     return circuit
 
@@ -231,7 +217,7 @@ def generate_model(
 
     encoding_layer = ScalableDataReuploadingController(
         num_input_params=n_qubits, num_params=num_params, circuit_depth=n_layers,
-        params=[str(param) for param in params] + [str(x) for x in inputs], tanh=True,
+        params=[str(param) for param in params] + [str(x) for x in inputs],
         trainable_scaling=trainable_scaling, use_reuploading=use_reuploading)
 
     expectation_layer = tfq.layers.ControlledPQC(
@@ -249,12 +235,11 @@ def generate_model(
         TrainableRescaling(len(observables), trainable_output, output_factor)
     ], name=prepend + "Q-values")
 
-    Q_values = process(expectation_values)
+    q_values = process(expectation_values)
 
-    # Define model
     model = tf.keras.Model(
         inputs=[input_q_state, input_tensor],
-        outputs=Q_values,
+        outputs=q_values,
         name=prepend + "Q-function")
 
     if not target:
@@ -269,14 +254,10 @@ def empty_circuits(n):
 
 def construct_readout_ops(qubits, env_name):
     if env_name == Envs.CARTPOLE:
-        readout_op = [cirq.PauliString(cirq.Z(qubits[0]) * cirq.Z(qubits[1])),
-                      cirq.PauliString(cirq.Z(qubits[2]) * cirq.Z(qubits[3]))]
-
-        # readout_op = [
-        #     cirq.PauliString(
-        #         cirq.Z(qubits[0]) * cirq.Z(qubits[1]) * cirq.Z(qubits[2]) * cirq.Z(qubits[3]))]
+        readout_op = [cirq.Z(qubits[0]) * cirq.Z(qubits[1]),
+                      cirq.Z(qubits[2]) * cirq.Z(qubits[3])]
     elif env_name == Envs.FROZENLAKE:
-        readout_op = [cirq.PauliString(cirq.Z(qubit)) for qubit in qubits]
+        readout_op = [cirq.Z(qubit) for qubit in qubits]
 
     return readout_op
 
@@ -297,9 +278,7 @@ def perform_action(
 
 
 def q_val(state, model, circuit, symbols, ops, encoding_depth, multiply_output_by, env_name):
-    params = model.trainable_variables
     state_circ = state_to_circuit(state, encoding_depth, env_name)
-    sample_circuit = state_circ + circuit
 
     if env_name == Envs.CARTPOLE:
         in_state = tfq.convert_to_tensor([state_circ])
@@ -312,13 +291,6 @@ def q_val(state, model, circuit, symbols, ops, encoding_depth, multiply_output_b
                 multiply_output_by]))
 
         output = action_preds.numpy()[0]
-
-        # expectation_layer = tfq.layers.Expectation()
-        # expectation_output = expectation_layer(
-        #     sample_circuit, symbol_names=symbols,
-        #     symbol_values=params, operators=ops)
-        #
-        # output = ((expectation_output.numpy()[0] + 1) / 2) * multiply_output_by
 
     elif env_name == Envs.FROZENLAKE:
         in_state = tfq.convert_to_tensor([state_circ])

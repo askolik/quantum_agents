@@ -15,8 +15,6 @@ def plot_avg_score():
 
 
 def plot_val_by_dir(val):
-    # path = '../../../../' + BASE_PATH + 'cartpole/no_arctan/'
-    # path = '/home/andrea/BAK/vql/' + BASE_PATH + 'cartpole/cirq/train_weights/'
     path = '../../../../' + BASE_PATH + 'cartpole/fixed_range_90/'
 
     for file_name in os.listdir(path):
@@ -29,18 +27,8 @@ def plot_val_by_dir(val):
                 learning_rate = meta.get('learning_rate')
                 update_after = meta.get('update_after')
                 update_target_after = meta.get('update_target_after')
-                # epsilon_schedule = meta.get('epsilon_schedule')
-                # memory_length = meta.get('memory_length')
-                # batch_size = meta.get('batch_size')
-                # data_reuploading = meta.get('data_reuploading')
-                # circuit_depth = meta.get('n_layers')
-                #
                 l1u = meta.get('l1_units')
                 l2u = meta.get('l2_units')
-
-                # if str(meta.get('env_solved_at')) != '[]':
-                #     pprint(meta)
-                #     print(file_name)
 
                 if True:
                     with open(path + file_name.replace('scores', val), 'rb') as file:
@@ -54,12 +42,6 @@ def plot_val_by_dir(val):
                         plt.ylabel('Score')
                         plt.show()
 
-                    # for dn in ['scaling']:  # ['loss', 'params', 'weights']:
-                    #     with open(path + file_name.replace('scores', dn), 'rb') as file:
-                    #             data = pickle.load(file)
-                    #             print(data)
-                    #             plt.plot(data)
-                    #             plt.show()
             except Exception as e:
                 print("Error with model", file_name)
                 print(e)
@@ -95,6 +77,9 @@ def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_
                             for element in data:
                                 concatenated += element
                             data = concatenated
+
+                        # plt.plot(data)
+                        # plt.show()
 
                         filled_vals = np.ones(shape=min_val) * data[-1]
                         filled_vals[:len(data)] = data
@@ -171,7 +156,6 @@ def plot_avg_score():
             memory_length = meta.get('memory_length')
             batch_size = meta.get('batch_size')
 
-            # if memory_length == 100000 and learning_rate == 0.0001 and update_after == 30 and update_target_after == 30:
             with open(path + file_name.replace('losses', 'scores'), 'rb') as file:
                 data = pickle.load(file)
                 # print(file_name)

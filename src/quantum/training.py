@@ -202,16 +202,6 @@ class QLearningFL(QLearning):
 
         output = action_preds.numpy()[0]
 
-        # params = self.model.trainable_variables
-        # state_circ = state_to_circuit(state, self.encoding_depth, self.env_name)
-        # sample_circuit = state_circ + self.circuit
-        #
-        # expectation_layer = tfq.layers.Expectation()
-        # expectation_output = expectation_layer(
-        #     sample_circuit, symbol_names=self.symbols,
-        #     symbol_values=params, operators=self.readout_op)
-        #
-        # output = ((expectation_output.numpy()[0] + 1) / 2) * self.multiply_output_by
         return output
 
     def save_env_data(self, transition_history, state_history, qval_history):
@@ -328,7 +318,7 @@ class QLearningFL(QLearning):
                 action, action_type = self.perform_action(state)
                 state, reward, done, _ = self.env.step(action)
 
-                self.add_to_memory(old_state, action, reward, state)
+                self.add_to_memory(old_state, action, reward, state, done)
 
                 if done:
                     # 1 if goal reached, 0 if died
@@ -723,15 +713,12 @@ class QLearningCartpoleClassical(QLearning):
 
             state = self.env.reset()
             for iteration in range(self.max_steps):
-                # self.env.render()
 
                 old_state = state
                 action, action_type = self.perform_action(state)
-                # print("Action:", action)
 
                 state, reward, done, _ = self.env.step(action)
 
-                # NNs perform much better when failed transitions get negative reward
                 if self.use_negative_rewards:
                     if done and iteration < 199:
                         reward *= -1
@@ -753,7 +740,6 @@ class QLearningCartpoleClassical(QLearning):
                     break
 
                 if len(self.memory) >= self.batch_size and iteration % self.update_after == 0:
-                    # print("Train step outer")
                     self.train_step()
 
                 if iteration % self.update_target_after == 0:
@@ -851,131 +837,6 @@ class RegressionFL:
             states_tensor, targets_tensor, self.model, self.optimizer, self.output_factor)
 
         return step_loss
-
-    def save_data(self):
-        with open(self.path + '{}_loss.pickle'.format(self.save_as), 'wb') as file:
-            pickle.dump(self.loss_history, file)
-
-        self.model.save_weights(self.path + '{}_model.h5'.format(self.save_as))
-
-
-class RegressionCP:
-    def __init__(
-            self,
-            circuit_depth,
-            encoding_depth,
-            gamma,
-            batch_size,
-            learning_rate,
-            output_factor,
-            enc_type,
-            save,
-            save_as,
-            test,
-            path=BASE_PATH):
-
-        self.circuit_depth = circuit_depth
-        self.encoding_depth = encoding_depth
-        self.gamma = gamma
-        self.batch_size = batch_size
-        self.learning_rate = learning_rate
-        self.output_factor = output_factor
-        self.enc_type = enc_type
-
-        self.model, self.optimizer = self.initialize_model()
-
-        self.loss_history = []
-
-        self.save = save
-        self.save_as = save_as
-        self.test = test
-        self.path = path
-
-        self.train_data = []
-
-    def initialize_model(self):
-        observation_space = 4
-        qubits = [cirq.GridQubit(0, i) for i in range(observation_space)]
-        readout_op = [
-            cirq.PauliString(cirq.Z(qubits[0])*cirq.Z(qubits[1])),
-            cirq.PauliString(cirq.Z(qubits[2])*cirq.Z(qubits[2]))]
-        circuit, symbols = create_q_circuit(observation_space, self.circuit_depth)
-
-        opt = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
-        model, target_model = build_models(circuit, readout_op, opt, tf.keras.losses.mse)
-
-        return model, opt
-
-    def load_data(self, path):
-        with open(path, 'rb') as file:
-            [states, q_vals] = pickle.load(file)
-
-        for i in range(len(states)):
-            self.train_data.append([states[i], q_vals[i]])
-
-    def sample_batch(self):
-        rnd_ixs = np.random.randint(0, len(self.train_data), size=self.batch_size)
-        batch = []
-        for ix in rnd_ixs:
-            batch.append(self.train_data[ix])
-        return batch
-
-    def regress(self, iterations):
-        if self.save:
-            meta = {
-                'circuit_depth': self.circuit_depth,
-                'encoding_depth': self.encoding_depth,
-                'gamma': self.gamma,
-                'batch_size': self.batch_size,
-                'learning_rate': self.learning_rate,
-                'output_factor': self.output_factor
-            }
-
-            with open(self.path + '{}_meta.pickle'.format(self.save_as), 'wb') as file:
-                pickle.dump(meta, file)
-
-        for i in range(iterations):
-            train_loss = self.train()
-            self.loss_history.append(train_loss)
-
-            if self.test:
-                print("Iteration {}: {}".format(i, train_loss))
-
-            if self.save:
-                self.save_data()
-
-    def train(self):
-        train_batch = self.sample_batch()
-        batch_states = []
-        batch_targets = []
-        for state, q_vals in train_batch:
-            batch_states.append(
-                state_to_circuit(
-                    state, self.encoding_depth, env_name=Envs.CARTPOLE, enc_type=self.enc_type))
-            batch_targets.append(q_vals)
-
-        # print("True Q values:", batch_targets)
-
-        states_tensor = tfq.convert_to_tensor(batch_states)
-        targets_tensor = np.array(batch_targets)
-        step_loss = self.train_step(states_tensor, targets_tensor)
-
-        return step_loss
-
-    def train_step(self, inputs, targets):
-        with tf.GradientTape() as tape:
-            preds = self.model(inputs)
-            scaled_preds = tf.divide(tf.add(preds, 1), 2)
-            action_preds = tf.multiply(
-                scaled_preds,
-                np.asarray([self.output_factor, self.output_factor]))
-
-            loss = tf.reduce_mean(tf.losses.mse(targets, action_preds))
-
-        grads = tape.gradient(loss, self.model.trainable_variables)
-        self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
-
-        return loss.numpy()
 
     def save_data(self):
         with open(self.path + '{}_loss.pickle'.format(self.save_as), 'wb') as file:
@@ -1093,19 +954,6 @@ def train_model_frozenlake(
     step_loss = train_step(
         states_tensor, targets_tensor, action_masks, model, opt, multiply_output_by, vector_form)
 
-    # batch_states = []
-    # batch_targets = []
-    # for old_state in alive_states:
-    #     batch_states.append(state_to_circuit(old_state, encoding_depth, env_name=env_name))
-    #     batch_targets.append(get_frozen_lake_true_q_vals(old_state, gamma))
-    #
-    # # print("True Q values:", batch_targets)
-    #
-    # states_tensor = tfq.convert_to_tensor(batch_states)
-    # targets_tensor = np.array(batch_targets)
-    # step_loss = train_step_frozen_lake_regression(
-    #     states_tensor, targets_tensor, model, opt, multiply_output_by)
-
     return step_loss
 
 
@@ -1195,9 +1043,6 @@ def train_step_frozen_lake_regression(inputs, targets, model, opt, multiply_outp
         action_preds = tf.multiply(
             scaled_preds, np.asarray([multiply_output_by, multiply_output_by, multiply_output_by, multiply_output_by]))
 
-        # print(action_preds)
-        # print(targets)
-        # print(tf.losses.mse(targets, action_preds))
         loss = tf.reduce_mean(tf.losses.mse(targets, action_preds))
 
     grads = tape.gradient(loss, model.trainable_variables)
