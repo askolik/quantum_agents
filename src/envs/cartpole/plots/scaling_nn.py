@@ -158,13 +158,19 @@ label_dict = {
 for params in [182, 347, 562, 770, 1142, 4610]:
     ax_coords = subplts.pop()
     curr_ax = axs[ax_coords[0], ax_coords[1]]
+    x_axis = plot_to
+    if params == 182:
+        x_axis = 1110
+
     plot_avg_vals(
         'scores', 5000, 10,
         bak_path + f'cartpole_classical/params_{params}/', label_dict[params], colors.pop(), hp_dict[params],
-        plot_to=plot_to, plt_obj=curr_ax)
+        plot_to=x_axis, plt_obj=curr_ax, avg_solved=True)
 
     curr_ax.legend()
 
 # fig.suptitle("NNs, legend shows: (hidden layer units), # params")
+fig.supxlabel('Episode')
+fig.supylabel('Score')
 fig.tight_layout()
 plt.show()

@@ -7,6 +7,8 @@ import seaborn as sb
 import numpy as np
 import os
 
+from tensorflow.python.keras.models import load_model
+
 from config import BASE_PATH
 
 
@@ -47,11 +49,14 @@ def plot_val_by_dir(val):
                 print(e)
 
 
-def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_to=None, plt_obj=None):
+def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_to=None, plt_obj=None, avg_solved=False):
     all_vals = []
+    env_solved = []
+
     best_agent_solved_at = 10000000
     best_agent_name = 'not found'
     best_agent_meta = 'not found'
+
     for file_name in os.listdir(path):
         if file_name[-13:] == 'scores.pickle' and file_name[:5] != 'dummy':
             try:
@@ -64,6 +69,9 @@ def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_
                     if meta.get(hp) != value:
                         include_agent = False
                         break
+                    else:
+                        if meta['env_solved_at']:
+                            env_solved.append(meta['env_solved_at'][0])
 
                 if include_agent:
                     # print(meta)
@@ -117,7 +125,7 @@ def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_
     fill_low = np.clip(np.asarray(mean_vals) - np.asarray(error), 0, None)
     fill_high = np.clip(np.asarray(mean_vals) + np.asarray(error), None, 200)
 
-    sb.set_style("whitegrid")
+    # sb.set_style("whitegrid")
 
     if plt_obj:
         if plot_to is not None:
@@ -133,6 +141,10 @@ def plot_avg_vals(val, min_val, avg_over, path, label, color, hyperparams, plot_
         else:
             sb.lineplot(list(range(len(mean_vals))), mean_vals, color=color, label=label)
             plt.fill_between(range(len(error)), fill_low, fill_high, color=color, lw=0, alpha=0.3)
+
+    if avg_solved:
+        avg_env_solved = np.mean(env_solved)
+        plt_obj.vlines(avg_env_solved, 0, 200, colors='grey', linestyles='--', )
 
     # plt.xlabel("Episode")
     # plt.ylabel("Score")
@@ -181,5 +193,5 @@ def plot_by_model_name(model_name, val, path, label, color):
         print(data)
 
         plt.plot(data, label=label, color=color)
-        # plt.title("Final {}: {}".format(val, data[-1]))
-        # plt.show()
+        plt.title("Final {}: {}".format(val, data[-1]))
+        plt.show()

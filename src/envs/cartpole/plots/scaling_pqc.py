@@ -92,7 +92,7 @@ path_dict = {
     15: bak_path + f'cartpole/depth_15_mse/',
     20: bak_path + f'cartpole/depth_20_mse/',
     25: bak_path + f'cartpole/depth_25_mse/',
-    30: path + f'cartpole/depth_scaling/'
+    30: bak_path + f'cartpole/depth_scaling/'
 }
 
 for depth in [5, 10, 15, 20, 25, 30]:
@@ -101,8 +101,8 @@ for depth in [5, 10, 15, 20, 25, 30]:
     plt_to = 4000 if depth == 3 else plot_to
     plot_avg_vals(
         'scores', 5000, 10,
-        path_dict[depth], f'{depth} ({depth * 4 * 3 + 2})', colors.pop(),
-        hp_dict[depth], plot_to=plt_to, plt_obj=curr_ax)
+        path_dict[depth], f'{depth} ({depth * (4 * 3) + 2})', colors.pop(),
+        hp_dict[depth], plot_to=plt_to, plt_obj=curr_ax, avg_solved=True)
 
     curr_ax.legend()
 
@@ -118,5 +118,7 @@ for depth in [5, 10, 15, 20, 25, 30]:
 # # plt.ylim(ymax=200)
 # plt.legend()  # loc='lower right')
 # fig.suptitle("PQCs, legend shows: # layers (# params)")
+fig.supxlabel('Episode')
+fig.supylabel('Score')
 fig.tight_layout()
 plt.show()
